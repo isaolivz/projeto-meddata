@@ -8,7 +8,7 @@ import sys
 import os
 
 #caminho raiz
-sys.path.append('/content/meddata-challenge')
+sys.path.append('/content/meddata-project')
 
 #importando o config
 from config import RAW_DIR, UF, ANO, MES, REFERENCE_DIR
