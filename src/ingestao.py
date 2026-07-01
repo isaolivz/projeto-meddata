@@ -36,7 +36,7 @@ def baixar_sih(uf=UF, ano=ANO, mes=MES):
 def baixar_cnes_leitos(uf= UF, ano=ANO, mes=MES):
     print(f"Baixando CNES {uf} {ano}/{mes}")
 
-    arquivos = cnes(state=uf, year=ano,month=mes, type='leitos')
+    arquivos = cnes(state=uf, year=ano,month=mes, group="LT")
     if not arquivos:
         raise ValueError(f"Nnenhum arquivo de leitos encontradopara {uf} {ano}/{mes}")
  
