@@ -1,0 +1,17 @@
+2026-07-10 17:57:13,467 - pipeline - INFO - ======================================================================
+2026-07-10 17:57:13,468 - pipeline - INFO - INICIANDO PIPELINE MEDDATA
+2026-07-10 17:57:13,468 - pipeline - INFO - UF: SP | Ano: 2024 | Mês: 01
+2026-07-10 17:57:13,468 - pipeline - INFO - ======================================================================
+2026-07-10 17:57:13,468 - pipeline - INFO - 
+[STEP 1] INGESTÃO DE DADOS
+2026-07-10 17:57:13,469 - pipeline - INFO - Baixando dados...
+2026-07-10 17:57:52,697 - pipeline - INFO - ✅ Ingestão concluída
+2026-07-10 17:57:52,698 - pipeline - INFO - 
+Resumo da raw:
+2026-07-10 17:57:52,698 - pipeline - INFO -    sih_raw: 3,637,794 registros, 36 colunas
+2026-07-10 17:57:52,698 - pipeline - INFO -    cnes_raw: 8,405 registros, 28 colunas
+2026-07-10 17:57:52,698 - pipeline - INFO -    ibge_raw: 645 registros, 9 colunas
+2026-07-10 17:57:52,698 - pipeline - INFO - 
+[STEP 2] TRANSFORMAÇÃO DE DADOS
+2026-07-10 17:57:52,698 - pipeline - INFO - Transformando dados...
+2026-07-10 17:58:30,566 - pipeline - ERROR - ❌ Erro na execução do pipeline: Passing 'suffixes' which cause duplicate columns {'codigo_municipio_hospital'} is not allowed.

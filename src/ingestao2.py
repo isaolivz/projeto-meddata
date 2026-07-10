@@ -10,16 +10,22 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 # 1. IMPORTANDO O CONFIG
 # -----------------------------------------
-# Importa a instância config em vez das variáveis
-from config import config
-
+from config import(
+    RAW_DIR, 
+    REFERENCE_DIR, 
+    UF, 
+    ANO, 
+    MES, 
+    get_codigo_uf,
+    get_nome_arquivo
+)
 
 # 2. FUNÇÃO QUE BAIXA SIH
 # -----------------------------------------
 def baixar_sih(
-    uf: str = None, 
-    ano: int = None, 
-    mes: int = None
+    uf: str = UF, 
+    ano: int = ANO, 
+    mes: int = MES
 ) -> Optional[pd.DataFrame]:
     """
     Baixa dados do SIH/SUS para uma UF específica.
@@ -32,14 +38,6 @@ def baixar_sih(
     Returns:
         DataFrame com os dados do SIH ou None se erro.
     """
-    # Usa valores do config se não foram passados
-    if uf is None:
-        uf = config.UF
-    if ano is None:
-        ano = config.ANO
-    if mes is None:
-        mes = config.MES
-    
     print(f"[SIH] Baixando dados: {uf} {ano}/{mes:02d}")
     
     try:
@@ -51,8 +49,7 @@ def baixar_sih(
         df = pd.read_parquet(arquivos[0])
         print(f"[SIH] Carregado: {len(df):,} registros")
 
-        # Usa o método get_nome_arquivo do config
-        caminho = config.RAW_DIR / config.get_nome_arquivo('sih')
+        caminho = RAW_DIR / get_nome_arquivo('sih')
         df.to_parquet(caminho, index=False)
         print(f"[SIH] Dados salvos em: {caminho}")
 
@@ -62,13 +59,12 @@ def baixar_sih(
         print(f"[ERRO SIH] {str(e)}") 
         return None
     
-
 # 3. FUNÇÃO QUE BAIXA CNES
 # -----------------------------------------
 def baixar_cnes_leitos(
-    uf: str = None,
-    ano: int = None,
-    mes: int = None,
+    uf: str = UF,
+    ano: int = ANO,
+    mes: int = MES,
 ) -> Optional[pd.DataFrame]:
     """
     Baixa dados de leitos do CNES para uma UF específica.
@@ -81,13 +77,6 @@ def baixar_cnes_leitos(
     Returns:
         DataFrame com dados de leitos ou None se erro.
     """
-    # Usa valores do config se não foram passados
-    if uf is None:
-        uf = config.UF
-    if ano is None:
-        ano = config.ANO
-    if mes is None:
-        mes = config.MES
     
     print(f"[CNES] Baixando dados {uf} {ano}/{mes:02d}")
 
@@ -100,7 +89,7 @@ def baixar_cnes_leitos(
         df = pd.read_parquet(arquivos[0])
         print(f"[CNES] Carregado: {len(df)} registros")  
 
-        caminho = config.RAW_DIR / config.get_nome_arquivo('cnes')
+        caminho = RAW_DIR / get_nome_arquivo('cnes')
         df.to_parquet(caminho, index=False)
         print(f"[CNES] Dados salvos em: {caminho}")
 
@@ -110,11 +99,12 @@ def baixar_cnes_leitos(
         print(f"[ERRO CNES] {str(e)}")
         return None
     
-
 # 4. FUNCAO QUE BAIXA IBGE
 # -----------------------------------------
 def baixar_ibge(
-    uf: str = None,
+    uf: str = UF,
+    ano: int = ANO,
+    mes: int = MES
 ) -> Optional[pd.DataFrame]:
     """
     Baixa dados de municípios do IBGE para uma UF específica.
@@ -125,17 +115,14 @@ def baixar_ibge(
     Returns:
         DataFrame com dados do IBGE ou None se erro.
     """
-    # Usa valor do config se não foi passado
-    if uf is None:
-        uf = config.UF
     
     print(f"[IBGE] Carregando dados para {uf}")
 
     try:
-        codigo_uf = config.get_codigo_uf(uf)
+        codigo_uf = get_codigo_uf(uf)
 
         if codigo_uf is None:
-            raise ValueError(f"UF '{uf}' não encontrada. Use uma das: {list(config.CODIGOS_UF.keys())}")
+            raise ValueError(f"UF '{uf}' não encontrada. Use uma das: {list(CODIGOS_UF.keys())}")
         
         url = "https://raw.githubusercontent.com/kelvins/municipios-brasileiros/main/csv/municipios.csv"
 
@@ -148,7 +135,7 @@ def baixar_ibge(
         
         print(f"[IBGE] Carregado: {len(df):,} municípios")  
 
-        caminho = config.REFERENCE_DIR / config.get_nome_arquivo('ibge')
+        caminho = REFERENCE_DIR / get_nome_arquivo('ibge')
         df.to_parquet(caminho, index=False)
         print(f"[IBGE] Dados salvos em: {caminho}")
 
@@ -158,13 +145,12 @@ def baixar_ibge(
         print(f"[ERRO IBGE] {str(e)}")
         return None
     
-
 # 5. FUNCAO PARA BAIXAR TODOS
 # -----------------------------------------
 def baixar_todos(
-    uf: str = None, 
-    ano: int = None, 
-    mes: int = None
+    uf: str = UF, 
+    ano: int = ANO, 
+    mes: int = MES
 ) -> dict:
     """
     Baixa todas as fontes de dados de uma vez.
@@ -177,14 +163,6 @@ def baixar_todos(
     Returns:
         Dicionário com os DataFrames baixados.
     """
-    # Usa valores do config se não foram passados
-    if uf is None:
-        uf = config.UF
-    if ano is None:
-        ano = config.ANO
-    if mes is None:
-        mes = config.MES
-    
     print("=" * 50)
     print("INICIANDO INGESTÃO DE DADOS")
     print(f"UF: {uf} | Ano: {ano} | Mês: {mes:02d}")
