@@ -26,11 +26,6 @@ from pathlib import Path
 from typing import Optional, Dict, Tuple
 import logging
 from datetime import datetime
-import sys
-
-# Adiciona src ao path
-sys.path.append(str(Path(__file__).parent))
-sys.path.append(str(Path(__file__).parent.parent))
 
 # Configuracao de logging
 logging.basicConfig(
@@ -416,42 +411,23 @@ class TransformadorDados:
         }
         df_integrado.rename(columns=rename_cnes, inplace=True)
         
-        # 2. Merge com IBGE (hospital) - CORRIGIDO
-        # Criar uma copia do IBGE com colunas renomeadas
-        colunas_ibge = ['codigo_municipio', 'nome_municipio', 'latitude', 'longitude']
-        df_ibge_hospital = df_ibge[colunas_ibge].copy()
-        df_ibge_hospital.rename(columns={
-            'nome_municipio': 'nome_municipio_hospital',
-            'latitude': 'latitude_hospital',
-            'longitude': 'longitude_hospital'
-        }, inplace=True)
-        
+        # 2. Merge com IBGE (hospital)
         df_integrado = df_integrado.merge(
-            df_ibge_hospital,
-            on='codigo_municipio',
-            how='left'
+            df_ibge,
+            left_on='codigo_municipio',
+            right_on='codigo_municipio',
+            how='left',
+            suffixes=('', '_ibge_hospital')
         )
         
-        # 3. Merge com IBGE (paciente) - CORRIGIDO
-        df_ibge_paciente = df_ibge[colunas_ibge].copy()
-        df_ibge_paciente.rename(columns={
-            'codigo_municipio': 'codigo_municipio_paciente_ibge',
-            'nome_municipio': 'nome_municipio_paciente',
-            'latitude': 'latitude_paciente',
-            'longitude': 'longitude_paciente'
-        }, inplace=True)
-        
+        # 3. Merge com IBGE (paciente)
         df_integrado = df_integrado.merge(
-            df_ibge_paciente,
+            df_ibge,
             left_on='codigo_municipio_paciente',
-            right_on='codigo_municipio_paciente_ibge',
-            how='left'
+            right_on='codigo_municipio',
+            how='left',
+            suffixes=('_hospital', '_paciente')
         )
-        
-        # Remove a coluna auxiliar
-        if 'codigo_municipio_paciente_ibge' in df_integrado.columns:
-            df_integrado.drop(columns=['codigo_municipio_paciente_ibge'], inplace=True)
-        
         self.logger.info(f"Merges com IBGE concluidos")
         
         # 4. Calcular distancia estimada
