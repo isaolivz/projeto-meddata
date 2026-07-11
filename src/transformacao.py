@@ -196,7 +196,11 @@ class TransformadorDados:
         df_transformado['dia_semana'] = df_transformado['data_internacao'].dt.day_name()
         
         # Mes/ano
-        df_transformado['mes_ano'] = df_transformado['data_internacao'].dt.to_period('M')
+        df_transformado['mes_ano'] = pd.PeriodIndex(
+            year=df_transformado['ano_competencia'],
+            month=df_transformado['mes_competencia'],
+            freq='M'
+        )
         
         # Tipo de dia
         df_transformado['tipo_dia'] = df_transformado['dia_semana'].apply(

@@ -243,15 +243,17 @@ class PipelineMedData:
     def _executar_exportacao(self):
         """Executa a etapa de exportação."""
         self.logger.info("Exportando dados...")
-        
+    
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        
-        for nome, df in self.dados.items():
-            if isinstance(df, pd.DataFrame) and len(df) > 0:
+        datasets_para_salvar = ['sih', 'cnes', 'ibge', 'integrado', 'ocupacao']
+    
+        for nome in datasets_para_salvar:
+            df = self.dados.get(nome)
+            if df is not None and isinstance(df, pd.DataFrame) and len(df) > 0:
                 caminho = self.config.PROCESSED_DIR / f"{nome}_{timestamp}.parquet"
                 df.to_parquet(caminho, index=False)
-                self.logger.info(f"   {nome}: {caminho}")
-        
+                self.logger.info(f"   {nome}: {caminho} ({len(df):,} registros)")
+    
         self.logger.info("✅ Exportação concluída")
     
     def _carregar_raw(self, nome: str) -> pd.DataFrame:
