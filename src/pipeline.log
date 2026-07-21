@@ -1,0 +1,79 @@
+2026-07-21 21:08:05,291 - pipeline - INFO - ======================================================================
+2026-07-21 21:08:05,291 - pipeline - INFO - INICIANDO PIPELINE MEDDATA
+2026-07-21 21:08:05,291 - pipeline - INFO - UF: SC | Ano: 2024 | Mês: 01
+2026-07-21 21:08:05,291 - pipeline - INFO - ======================================================================
+2026-07-21 21:08:05,291 - pipeline - INFO - 
+[STEP 1] INGESTÃO DE DADOS
+2026-07-21 21:08:05,291 - pipeline - INFO - Baixando dados...
+2026-07-21 21:08:16,991 - pipeline - INFO - ✅ Ingestão concluída
+2026-07-21 21:08:16,992 - pipeline - INFO - 
+Resumo da raw:
+2026-07-21 21:08:16,992 - pipeline - INFO -    sih_raw: 790,683 registros, 36 colunas
+2026-07-21 21:08:16,992 - pipeline - INFO -    cnes_raw: 1,945 registros, 28 colunas
+2026-07-21 21:08:16,993 - pipeline - INFO -    ibge_raw: 295 registros, 9 colunas
+2026-07-21 21:08:16,993 - pipeline - INFO - 
+[STEP 2] TRANSFORMAÇÃO DE DADOS
+2026-07-21 21:08:16,993 - pipeline - INFO - Transformando dados...
+2026-07-21 21:09:09,558 - pipeline - INFO - ✅ Transformação concluída
+2026-07-21 21:09:09,558 - pipeline - INFO - 
+Resumo da transformado:
+2026-07-21 21:09:09,558 - pipeline - INFO -    sih_raw: 790,683 registros, 36 colunas
+2026-07-21 21:09:09,558 - pipeline - INFO -    cnes_raw: 1,945 registros, 28 colunas
+2026-07-21 21:09:09,559 - pipeline - INFO -    ibge_raw: 295 registros, 9 colunas
+2026-07-21 21:09:09,559 - pipeline - INFO -    sih: 372,559 registros, 14 colunas
+2026-07-21 21:09:09,559 - pipeline - INFO -    cnes: 1,036 registros, 15 colunas
+2026-07-21 21:09:09,559 - pipeline - INFO -    ibge: 295 registros, 4 colunas
+2026-07-21 21:09:09,559 - pipeline - INFO -    integrado: 1,903,259 registros, 36 colunas
+2026-07-21 21:09:09,559 - pipeline - INFO -    ocupacao: 2,772 registros, 7 colunas
+2026-07-21 21:09:09,559 - pipeline - INFO - 
+[STEP 3] VALIDAÇÃO DOS DADOS
+2026-07-21 21:09:09,559 - pipeline - INFO - Validando dados...
+2026-07-21 21:09:10,532 - pipeline - INFO -    sih: OK
+2026-07-21 21:09:10,537 - pipeline - INFO -    cnes: OK
+2026-07-21 21:09:10,538 - pipeline - INFO -    ibge: OK
+2026-07-21 21:09:28,713 - pipeline - INFO -    integrado: OK
+2026-07-21 21:09:28,715 - pipeline - INFO - ✅ Validação concluída
+2026-07-21 21:09:28,716 - pipeline - INFO - 
+[STEP 4] CÁLCULO DE INDICADORES
+2026-07-21 21:09:28,716 - pipeline - INFO - Calculando indicadores...
+2026-07-21 21:09:29,256 - pipeline - INFO -    Indicadores calculados:
+2026-07-21 21:09:29,256 - pipeline - INFO -       total_internacoes: 1903259.00
+2026-07-21 21:09:29,256 - pipeline - INFO -       total_hospitais: 168.00
+2026-07-21 21:09:29,256 - pipeline - INFO -       total_municipios: 43.00
+2026-07-21 21:09:29,257 - pipeline - INFO -       periodo_inicio: 2015-06-04 00:00:00
+2026-07-21 21:09:29,257 - pipeline - INFO -       periodo_fim: 2024-01-31 00:00:00
+2026-07-21 21:09:29,257 - pipeline - INFO -       media_permanencia: 6.65
+2026-07-21 21:09:29,257 - pipeline - INFO -       mediana_permanencia: 3.00
+2026-07-21 21:09:29,257 - pipeline - INFO -       max_permanencia: 3163.00
+2026-07-21 21:09:29,257 - pipeline - INFO -       total_dias_internacao: 12662402
+2026-07-21 21:09:29,257 - pipeline - INFO -       custo_total: 470120807.11
+2026-07-21 21:09:29,257 - pipeline - INFO -       custo_medio: 247.01
+2026-07-21 21:09:29,258 - pipeline - INFO -       custo_mediana: 58.32
+2026-07-21 21:09:29,258 - pipeline - INFO -       custo_maximo: 110981.80
+2026-07-21 21:09:29,258 - pipeline - INFO -       taxa_ocupacao_media: 89.82
+2026-07-21 21:09:29,258 - pipeline - INFO -       taxa_ocupacao_max: 100.00
+2026-07-21 21:09:29,258 - pipeline - INFO -       hospitais_com_ocupacao: 2772.00
+2026-07-21 21:09:29,258 - pipeline - INFO -       leitos_sus_totais: 56764
+2026-07-21 21:09:29,258 - pipeline - INFO -       taxa_deslocamento: 75.26
+2026-07-21 21:09:29,258 - pipeline - INFO -       total_viajaram: 1432485
+2026-07-21 21:09:29,258 - pipeline - INFO -       distancia_media: 12.78
+2026-07-21 21:09:29,259 - pipeline - INFO -       top_diagnosticos: {'O800': 99808, 'I64': 41387, 'J189': 28685, 'N390': 27827, 'I219': 26823, 'I200': 24601, 'A419': 20417, 'A499': 18488, 'O342': 17781, 'K359': 17265}
+2026-07-21 21:09:29,260 - pipeline - INFO -       total_diagnosticos: 3337.00
+2026-07-21 21:09:29,260 - pipeline - INFO - ✅ Indicadores calculados
+2026-07-21 21:09:29,260 - pipeline - INFO - 
+[STEP 5] GERAÇÃO DE VISUALIZAÇÕES
+2026-07-21 21:09:29,260 - pipeline - INFO - Gerando visualizações...
+2026-07-21 21:09:38,657 - pipeline - INFO - ✅ Visualizações geradas
+2026-07-21 21:09:38,658 - pipeline - INFO - 
+[STEP 6] EXPORTAÇÃO DOS DADOS
+2026-07-21 21:09:38,658 - pipeline - INFO - Exportando dados...
+2026-07-21 21:09:40,114 - pipeline - INFO -    sih: /content/meddata-project/data/processed/sih_20260721_210938.parquet (372,559 registros)
+2026-07-21 21:09:40,121 - pipeline - INFO -    cnes: /content/meddata-project/data/processed/cnes_20260721_210938.parquet (1,036 registros)
+2026-07-21 21:09:40,124 - pipeline - INFO -    ibge: /content/meddata-project/data/processed/ibge_20260721_210938.parquet (295 registros)
+2026-07-21 21:09:52,944 - pipeline - INFO -    integrado: /content/meddata-project/data/processed/integrado_20260721_210938.parquet (1,903,259 registros)
+2026-07-21 21:09:52,958 - pipeline - INFO -    ocupacao: /content/meddata-project/data/processed/ocupacao_20260721_210938.parquet (2,772 registros)
+2026-07-21 21:09:52,959 - pipeline - INFO - ✅ Exportação concluída
+2026-07-21 21:09:52,959 - pipeline - INFO - 
+======================================================================
+2026-07-21 21:09:52,959 - pipeline - INFO - ✅ PIPELINE CONCLUÍDO COM SUCESSO!
+2026-07-21 21:09:52,959 - pipeline - INFO - ======================================================================
