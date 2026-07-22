@@ -77,10 +77,11 @@ class TransformadorDados:
         
         # Dicionario de mapeamento para esfera
         self.MAPEAMENTO_ESFERA = {
-            'E': 'Estadual',
-            'M': 'Municipal',
-            'F': 'Federal'
-        }
+        'E': 'Estadual',
+        'M': 'Municipal',
+        'F': 'Federal',
+        '': 'Não Informado',
+    }
         
         self.logger.info(f"Transformador inicializado para {self.uf} {self.ano}/{self.mes:02d}")
     
@@ -293,6 +294,11 @@ class TransformadorDados:
             'NAT_JUR': 'natureza_juridica',
         }
         df_agrupado.rename(columns=mapeamento_colunas, inplace=True)
+
+        # 6.5. Mapear tipos de leito
+        df_agrupado['tipo_leito'] = df_agrupado['tipo_leito'].map(
+        self.MAPEAMENTO_LEITOS
+        ).fillna('Outros')
         
         # 7. Classificar porte hospitalar
         def classificar_porte(total_leitos):
@@ -312,16 +318,16 @@ class TransformadorDados:
         df_agrupado['alta_complexidade'] = df_agrupado['nivel_hierarquico'].apply(
             lambda x: 'Alta Complexidade' if pd.notna(x) and x != '' else 'Baixa/Media Complexidade'
         )
-        
-        # 9. Classificar esfera
+
+        # 9. Classificar esfera (usando o mapeamento da classe)
         df_agrupado['esfera_classificacao'] = df_agrupado['esfera'].map(
-            self.MAPEAMENTO_ESFERA
-        ).fillna('Privado')
+        self.MAPEAMENTO_ESFERA
+        ).fillna('Não Informado')
         
         # 10. Percentual de leitos SUS
         df_agrupado['percentual_sus'] = (
             df_agrupado['leitos_sus'] / df_agrupado['total_leitos'] * 100
-        ).fillna(0).clip(0, 100)
+        ).fillna(0).clip(0, 100).round(2)
         
         self.logger.info(f"CNES transformado: {len(df_agrupado):,} hospitais")
         
@@ -420,7 +426,7 @@ class TransformadorDados:
         }
         df_integrado.rename(columns=rename_cnes, inplace=True)
         
-        # 2. Merge com IBGE (hospital) - CORRIGIDO
+        # 2. Merge com IBGE (hospital)
         # Criar uma copia do IBGE com colunas renomeadas
         colunas_ibge = ['codigo_municipio', 'nome_municipio', 'latitude', 'longitude']
         df_ibge_hospital = df_ibge[colunas_ibge].copy()
@@ -436,7 +442,7 @@ class TransformadorDados:
             how='left'
         )
         
-        # 3. Merge com IBGE (paciente) - CORRIGIDO
+        # 3. Merge com IBGE (paciente)
         df_ibge_paciente = df_ibge[colunas_ibge].copy()
         df_ibge_paciente.rename(columns={
             'codigo_municipio': 'codigo_municipio_paciente_ibge',
@@ -488,7 +494,12 @@ class TransformadorDados:
         )
         
         # 5. Calcular taxa de ocupacao
-        df_integrado['ano_mes'] = df_integrado['data_internacao'].dt.to_period('M')
+        # Usar ano_competencia e mes_competencia em vez de data_internacao
+        df_integrado['ano_mes'] = pd.PeriodIndex(
+        year=df_integrado['ano_competencia'],
+        month=df_integrado['mes_competencia'],
+        freq='M'
+    )
         
         # Agrupar por hospital e mes
         internacoes_por_hospital = df_integrado.groupby(
