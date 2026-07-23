@@ -296,7 +296,7 @@ class TransformadorDados:
         df_agrupado.rename(columns=mapeamento_colunas, inplace=True)
 
         # 6.5. Mapear tipos de leito
-        df_agrupado['tipo_leito'] = df_agrupado['tipo_leito'].map(
+        df_agrupado['tipo_leito_nome'] = df_agrupado['tipo_leito'].map(
         self.MAPEAMENTO_LEITOS
         ).fillna('Outros')
         
