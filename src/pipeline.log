@@ -77,3 +77,12 @@ Resumo da transformado:
 ======================================================================
 2026-07-21 21:09:52,959 - pipeline - INFO - ✅ PIPELINE CONCLUÍDO COM SUCESSO!
 2026-07-21 21:09:52,959 - pipeline - INFO - ======================================================================
+2026-07-30 15:27:33,893 - pipeline - INFO - ======================================================================
+2026-07-30 15:27:33,894 - pipeline - INFO - INICIANDO PIPELINE MEDDATA
+2026-07-30 15:27:33,896 - pipeline - INFO - UF: PR | Ano: 2024 | Mês: 01
+2026-07-30 15:27:33,897 - pipeline - INFO - ======================================================================
+2026-07-30 15:27:33,897 - pipeline - INFO - 
+[STEP 1] INGESTÃO DE DADOS
+2026-07-30 15:27:33,897 - pipeline - INFO - Baixando dados...
+2026-07-30 15:28:03,189 - pipeline - INFO - Ingestão concluída
+2026-07-30 15:28:03,189 - pipeline - ERROR - Erro na execução do pipeline: 'PipelineMedData' object has no attribute '_resumo_dados'

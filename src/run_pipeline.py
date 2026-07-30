@@ -137,27 +137,34 @@ class PipelineMedData:
         self.logger.info("Transformação concluída")
         self._resumo_dados('transformado')
     
-def _executar_exportacao(self):
-    """Executa a etapa de exportação."""
-    self.logger.info("Exportando dados...")
+    def _executar_exportacao(self):
+        """Executa a etapa de exportação."""
+        self.logger.info("Exportando dados...")
     
-    # Usa o mesmo padrão do transformacao.py
-    datasets_para_salvar = {
-        'sih': f"sih_transformado_{self.uf}_{self.ano}_{self.mes:02d}.parquet",
-        'cnes': f"cnes_transformado_{self.uf}_{self.ano}_{self.mes:02d}.parquet",
-        'ibge': f"ibge_transformado_{self.uf}.parquet",
-        'integrado': f"meddata_integrado_{self.uf}_{self.ano}_{self.mes:02d}.parquet",
-        'ocupacao': f"ocupacao_hospitalar_{self.uf}_{self.ano}_{self.mes:02d}.parquet",
-    }
+         # Usa o mesmo padrão do transformacao.py
+        datasets_para_salvar = {
+            'sih': f"sih_transformado_{self.uf}_{self.ano}_{self.mes:02d}.parquet",
+            'cnes': f"cnes_transformado_{self.uf}_{self.ano}_{self.mes:02d}.parquet",
+            'ibge': f"ibge_transformado_{self.uf}.parquet",
+            'integrado': f"meddata_integrado_{self.uf}_{self.ano}_{self.mes:02d}.parquet",
+            'ocupacao': f"ocupacao_hospitalar_{self.uf}_{self.ano}_{self.mes:02d}.parquet",
+        }
     
-    for nome, nome_arquivo in datasets_para_salvar.items():
-        df = self.dados.get(nome)
-        if df is not None and isinstance(df, pd.DataFrame) and len(df) > 0:
-            caminho = self.config.PROCESSED_DIR / nome_arquivo
-            df.to_parquet(caminho, index=False)
-            self.logger.info(f"   {nome}: {caminho} ({len(df):,} registros)")
+        for nome, nome_arquivo in datasets_para_salvar.items():
+            df = self.dados.get(nome)
+            if df is not None and isinstance(df, pd.DataFrame) and len(df) > 0:
+                caminho = self.config.PROCESSED_DIR / nome_arquivo
+                df.to_parquet(caminho, index=False)
+                self.logger.info(f"   {nome}: {caminho} ({len(df):,} registros)")
     
-    self.logger.info(" Exportação concluída")
+        self.logger.info(" Exportação concluída")
+
+    def _resumo_dados(self, etapa: str):
+        """Mostra resumo dos dados."""
+        self.logger.info(f"\nResumo da {etapa}:")
+        for nome, df in self.dados.items():
+            if isinstance(df, pd.DataFrame):
+                self.logger.info(f"   {nome}: {len(df):,} registros, {len(df.columns)} colunas")
 
 def main():
     """Função principal."""
