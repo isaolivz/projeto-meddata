@@ -539,3 +539,43 @@ Resumo da transformado:
 ======================================================================
 2026-07-31 14:44:50,562 - pipeline - INFO - PIPELINE CONCLUÍDO COM SUCESSO!
 2026-07-31 14:44:50,562 - pipeline - INFO - ======================================================================
+2026-08-07 22:26:12,986 - pipeline - INFO - ======================================================================
+2026-08-07 22:26:12,986 - pipeline - INFO - INICIANDO PIPELINE MEDDATA
+2026-08-07 22:26:12,987 - pipeline - INFO - UF: PR | Ano: 2024 | Mês: 01
+2026-08-07 22:26:12,987 - pipeline - INFO - ======================================================================
+2026-08-07 22:26:12,987 - pipeline - INFO - 
+[STEP 1] INGESTÃO DE DADOS
+2026-08-07 22:26:12,987 - pipeline - INFO - Baixando dados...
+2026-08-07 22:26:55,220 - pipeline - INFO - Ingestão concluída
+2026-08-07 22:26:55,220 - pipeline - INFO - 
+Resumo da raw:
+2026-08-07 22:26:55,221 - pipeline - INFO -    sih_raw: 1,094,419 registros, 36 colunas
+2026-08-07 22:26:55,221 - pipeline - INFO -    cnes_raw: 3,295 registros, 28 colunas
+2026-08-07 22:26:55,221 - pipeline - INFO -    ibge_raw: 399 registros, 9 colunas
+2026-08-07 22:26:55,221 - pipeline - INFO - 
+[STEP 2] TRANSFORMAÇÃO DE DADOS
+2026-08-07 22:26:55,221 - pipeline - INFO - Transformando dados...
+2026-08-07 22:28:09,901 - pipeline - INFO - Transformação concluída
+2026-08-07 22:28:09,902 - pipeline - INFO - 
+Resumo da transformado:
+2026-08-07 22:28:09,902 - pipeline - INFO -    sih_raw: 1,094,419 registros, 36 colunas
+2026-08-07 22:28:09,903 - pipeline - INFO -    cnes_raw: 3,295 registros, 28 colunas
+2026-08-07 22:28:09,903 - pipeline - INFO -    ibge_raw: 399 registros, 9 colunas
+2026-08-07 22:28:09,903 - pipeline - INFO -    sih: 532,538 registros, 14 colunas
+2026-08-07 22:28:09,903 - pipeline - INFO -    cnes: 1,707 registros, 16 colunas
+2026-08-07 22:28:09,904 - pipeline - INFO -    ibge: 399 registros, 4 colunas
+2026-08-07 22:28:09,904 - pipeline - INFO -    integrado: 2,700,310 registros, 37 colunas
+2026-08-07 22:28:09,904 - pipeline - INFO -    ocupacao: 1,141 registros, 7 colunas
+2026-08-07 22:28:09,904 - pipeline - INFO - 
+[STEP 3] EXPORTAÇÃO DOS DADOS
+2026-08-07 22:28:09,904 - pipeline - INFO - Exportando dados...
+2026-08-07 22:28:12,030 - pipeline - INFO -    sih: /content/meddata-project/data/processed/sih_transformado_PR_2024_01.parquet (532,538 registros)
+2026-08-07 22:28:12,042 - pipeline - INFO -    cnes: /content/meddata-project/data/processed/cnes_transformado_PR_2024_01.parquet (1,707 registros)
+2026-08-07 22:28:12,045 - pipeline - INFO -    ibge: /content/meddata-project/data/processed/ibge_transformado_PR.parquet (399 registros)
+2026-08-07 22:28:30,444 - pipeline - INFO -    integrado: /content/meddata-project/data/processed/meddata_integrado_PR_2024_01.parquet (2,700,310 registros)
+2026-08-07 22:28:30,451 - pipeline - INFO -    ocupacao: /content/meddata-project/data/processed/ocupacao_hospitalar_PR_2024_01.parquet (1,141 registros)
+2026-08-07 22:28:30,451 - pipeline - INFO - Exportação concluída
+2026-08-07 22:28:30,451 - pipeline - INFO - 
+======================================================================
+2026-08-07 22:28:30,451 - pipeline - INFO - PIPELINE CONCLUÍDO COM SUCESSO!
+2026-08-07 22:28:30,452 - pipeline - INFO - ======================================================================
