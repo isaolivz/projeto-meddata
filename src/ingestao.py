@@ -1,5 +1,6 @@
 import pandas as pd
-
+from pysus import sih
+from pysus import cnes
 from pathlib import Path
 import sys
 from typing import Optional 
