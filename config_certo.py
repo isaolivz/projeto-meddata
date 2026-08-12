@@ -111,18 +111,12 @@ class Config:
         if uf is None:
             uf = self.UF
         return self.CODIGOS_UF.get(uf)
-
-    def get_nome_arquivo(self, prefixo, uf=None, ano=None, mes=None, extensao='parquet'):
-        if uf is None:
-            uf = self.UF
-        if ano is None:
-            ano = self.ANO
-        if mes is None:
-            mes = self.MES
-        return f"{prefixo}_{uf}_{ano}_{mes:02d}.{extensao}"
+    
+    def get_nome_arquivo(self, prefixo, extensao='parquet'):
+        """Gera nome de arquivo padronizado."""
+        return f"{prefixo}_{self.UF}_{self.ANO}_{self.MES:02d}.{extensao}"
     
     def to_dict(self):
-
         """Converte configuração para dicionário."""
         return {
             'UF': self.UF,
