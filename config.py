@@ -3,13 +3,12 @@ Configurações centrais do projeto MedData.
 
 Este arquivo contém todas as configurações do sistema:
 - Diretórios do projeto
-- Parâmetros dos dados (UF, ano, mês)
+- Parâmetros dos dados caso não seja passado via linha de comando (UF, ano, mês)
 - Colunas do SIH e mapeamento
 - Códigos auxiliares (IBGE)
 
-Uso:
-    from config import config
-    print(config.UF)
+Esse código foi usado pelo grupo principalmente para ajudar na organização
+do projeto
 """
 
 from pathlib import Path

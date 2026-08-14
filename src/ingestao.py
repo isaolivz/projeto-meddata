@@ -17,18 +17,16 @@ sys.path.append(str(Path(__file__).parent.parent))
 from config import config
 
 
-# ============================================================
 # FUNÇÃO DE UPLOAD PARA OBJECT STORAGE
-# ============================================================
+#----------------------------------------
 def upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: str = "meddata-bronze"):
     """
-    Faz upload de um arquivo para o Object Storage da OCI.
-    
-    Args:
-        arquivo_local: Caminho do arquivo local
-        objeto_name: Nome do objeto no Object Storage
-        bucket: Nome do bucket (padrão: meddata-bronze)
+    Aqui nós queriamos que os arquivos salvos já fossem encaminhados
+    para o Object Storage pois usamos a VM da oracle que, através dos
+    scripts precisava de um fluxo.
     """
+
+    #pesquisamos e configuramos, adicionamos tratamento de erros pra saber onde estava falhando
     try:
         config_oci = from_file()
         object_storage = oci.object_storage.ObjectStorageClient(config_oci)
@@ -44,15 +42,15 @@ def upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: st
         return False
 
 
-# ============================================================
+
 # 2. FUNÇÃO QUE BAIXA SIH
-# ============================================================
+#-----------------------------------------------
 def baixar_sih(
     uf: str = None, 
     ano: int = None, 
     mes: int = None,
     upload: bool = True
-) -> Optional[pd.DataFrame]:
+) -> Optional[pd.DataFrame]: #irá retornar um DF ou None
     """
     Baixa dados do SIH/SUS e envia para o Object Storage.
     """
@@ -90,6 +88,8 @@ def baixar_sih(
         
         # Limpar arquivo temporário
         os.remove(caminho_local)
+
+        ##ver se precisa do arquivo temp
         
         return df
     
