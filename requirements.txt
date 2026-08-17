@@ -1,0 +1,6 @@
+pandas
+pysus
+numpy
+matplotlib
+seaborn
+oci
