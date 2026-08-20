@@ -429,7 +429,7 @@ if __name__ == "__main__":
     config.MES = args.mes
 
     from transformacao import transformar_sih, transformar_cnes, transformar_ibge
-    from ingestao_domingo_editando import baixar_sih, baixar_cnes_leitos, baixar_ibge
+    from ingestao import baixar_sih, baixar_cnes_leitos, baixar_ibge
 
     df_sih_raw = baixar_sih(args.uf, args.ano, args.mes, upload=False)
     df_cnes_raw = baixar_cnes_leitos(args.uf, args.ano, args.mes, upload=False)
