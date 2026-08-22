@@ -196,10 +196,12 @@ def validar_consistencia(dim_municipio, dim_hospital, dim_tempo, fato):
         if len(invalidos) > 0:
             erros.append(f"DIM_HOSPITAL: {len(invalidos)} registros com percentual SUS invalido")
     
-    # ============================================================
-    # REMOVIDO: Verificacao de ano fixo
-    # A DIM_TEMPO pode ter qualquer ano (2023, 2024, 2025...)
-    # ============================================================
+    # DIM_TEMPO: apenas 2024
+    if dim_tempo is not None and len(dim_tempo) > 0:
+        if 'ano' in dim_tempo.columns:
+            anos_invalidos = dim_tempo[dim_tempo['ano'] != 2024]
+            if len(anos_invalidos) > 0:
+                erros.append(f"DIM_TEMPO: {len(anos_invalidos)} registros com ano diferente de 2024")
     
     # FATO_INTERNACAO: dias de internacao nao negativos
     if fato is not None and 'dias_internacao' in fato.columns:
