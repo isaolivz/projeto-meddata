@@ -8,15 +8,24 @@ from pathlib import Path
 import sys
 import os
 
-# Adiciona a pasta raiz ao path do Python
+'''Alguns pontos da criaçaõ dos scripts:
+1. o fluxo é: integração - Transformação - Integração - Validação - Carga
+'''
+
+# adiciona a pasta raiz ao path
 sys.path.append(str(Path(__file__).parent.parent))
 
-# Importa o config
+# importa o config
 from config import config
 
 
-# FUNÇÃO DE UPLOAD PARA OBJECT STORAGE
+# 1. Upload para o Object Storage
+#---------------------------------
+
 def upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: str = "meddata-bronze"):
+    '''Como criamos um Object Storage voltado para armazenar os arquivos raw, 
+    fizemos essa função mas não foi nossa prioridade para nosso mvp'''
+
     try:
         config_oci = from_file()
         object_storage = oci.object_storage.ObjectStorageClient(config_oci)
@@ -32,7 +41,9 @@ def upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: st
         return False
 
 
-# FUNÇÃO QUE BAIXA SIH
+#2. Baixar dados do SIH - Internações
+#-------------------------------------
+
 def baixar_sih(uf=None, ano=None, mes=None, upload=True):
     if uf is None:
         uf = config.UF
@@ -41,6 +52,9 @@ def baixar_sih(uf=None, ano=None, mes=None, upload=True):
     if mes is None:
         mes = config.MES
     
+    '''Alogica é que seja passado no terminal mesmo o argpase para o estado, uf, ano, mes desejado 
+    mas se nao for passado pegamos as variaveis do arquivo config'''
+
     print(f"[SIH] Baixando dados: {uf} {ano}/{mes:02d}")
     
     try:
@@ -57,7 +71,7 @@ def baixar_sih(uf=None, ano=None, mes=None, upload=True):
         df.to_parquet(caminho_raw, index=False)
         print(f"[SIH] Salvo localmente em: {caminho_raw}")
         
-        # Upload para Object Storage (Camada Bronze)
+        # Upload para Object Storage
         if upload:
             objeto_name = f"sih/{uf}/{ano}/sih_{uf}_{ano}_{mes:02d}.parquet"
             upload_para_object_storage(caminho_raw, objeto_name, "meddata-bronze")
@@ -69,7 +83,8 @@ def baixar_sih(uf=None, ano=None, mes=None, upload=True):
         return None
 
 
-# FUNÇÃO QUE BAIXA CNES
+# 3. Baixar o CNES - leitos
+# ---------------------------
 def baixar_cnes_leitos(uf=None, ano=None, mes=None, upload=True):
     if uf is None:
         uf = config.UF
@@ -106,7 +121,9 @@ def baixar_cnes_leitos(uf=None, ano=None, mes=None, upload=True):
         return None
 
 
-# FUNÇÃO QUE BAIXA IBGE
+#4. Baixar o IBGE - csv para municipios
+#-----------------------------------------
+
 def baixar_ibge(uf=None, upload=True):
     uf = uf or config.UF
 
@@ -154,7 +171,9 @@ def baixar_ibge(uf=None, upload=True):
         return None
 
 
-# FUNÇÃO PARA BAIXAR TODOS
+#5. Função para baixar todos
+#-----------------------------
+
 def baixar_todos(uf=None, ano=None, mes=None, upload=True):
     if uf is None:
         uf = config.UF
@@ -186,8 +205,10 @@ def baixar_todos(uf=None, ano=None, mes=None, upload=True):
     return resultados
 
 
-# MAIN
+# 6. Main
 if __name__ == "__main__":
+    ''' No main colocamos as funções para passar o argpase'''
+
     parser = argparse.ArgumentParser(description="Ingestão de dados do MedData")
     parser.add_argument('--uf', type=str, default=config.UF, help='UF do estado')
     parser.add_argument('--ano', type=int, default=config.ANO, help='Ano dos dados')

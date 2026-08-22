@@ -1,117 +1,208 @@
 -- ============================================================
 -- SCRIPT DE CRIAÇÃO DAS TABELAS - MEDDATA
--- Autor: Isabella Oliveira
 -- Projeto: MedData - Challenge Oracle 2026
 -- ============================================================
+-- ============================================================
+-- SCRIPT DDL - MEDDATA STAR SCHEMA
+-- ============================================================
+--
+-- MUDANCAS REALIZADAS:
+-- 1. Removida coluna LEITOS_CONTRATADOS (100% zerado)
+-- 2. Removida coluna ESFERA_CLASSIFICACAO (todos "Nao informado")
+-- 3. Adicionadas colunas UF_HOSPITAL e ESTADO_HOSPITAL
+-- 4. Adicionadas colunas UF_PACIENTE e ESTADO_PACIENTE
+-- 5. Latitude/longitude no formato NUMBER(13,6)
+-- ============================================================
+
+-- DROP DAS TABELAS (caso existam)
+-- DROP TABLE FATO_INTERNACAO CASCADE CONSTRAINT;
+-- DROP TABLE DIM_HOSPITAL CASCADE CONSTRAINT;
+-- DROP TABLE DIM_MUNICIPIO CASCADE CONSTRAINT;
+-- DROP TABLE DIM_TEMPO CASCADE CONSTRAINT;
+
 
 -- ============================================================
--- 1. TABELA DIM_HOSPITAL (Dimensão Hospitais)
--- ============================================================
-
-CREATE TABLE DIM_HOSPITAL (
-    hospital_id         VARCHAR2(50) PRIMARY KEY,
-    codigo_municipio    VARCHAR2(20),
-    municipio_nome      VARCHAR2(100),
-    leitos_totais       NUMBER,
-    leitos_contratados  NUMBER,
-    leitos_sus          NUMBER,
-    leitos_nao_sus      NUMBER,
-    porte               VARCHAR2(50),
-    alta_complexidade   VARCHAR2(10),
-    esfera              VARCHAR2(50),
-    percentual_sus      NUMBER(5,2),
-    latitude            NUMBER(10,6),
-    longitude           NUMBER(10,6)
-);
-
--- Comentários para o SELECT AI entender
-COMMENT ON TABLE DIM_HOSPITAL IS 'Cadastro de hospitais com informações de leitos e localização.';
-COMMENT ON COLUMN DIM_HOSPITAL.hospital_id IS 'Identificador único do hospital.';
-COMMENT ON COLUMN DIM_HOSPITAL.codigo_municipio IS 'Código do município onde o hospital está localizado.';
-COMMENT ON COLUMN DIM_HOSPITAL.municipio_nome IS 'Nome do município do hospital.';
-COMMENT ON COLUMN DIM_HOSPITAL.leitos_totais IS 'Número total de leitos disponíveis no hospital.';
-COMMENT ON COLUMN DIM_HOSPITAL.leitos_contratados IS 'Número de leitos contratados pelo SUS.';
-COMMENT ON COLUMN DIM_HOSPITAL.leitos_sus IS 'Número de leitos exclusivos para o SUS.';
-COMMENT ON COLUMN DIM_HOSPITAL.leitos_nao_sus IS 'Número de leitos não SUS (privados).';
-COMMENT ON COLUMN DIM_HOSPITAL.porte IS 'Porte do hospital (ex: pequeno, médio, grande).';
-COMMENT ON COLUMN DIM_HOSPITAL.alta_complexidade IS 'Indica se o hospital realiza procedimentos de alta complexidade.';
-COMMENT ON COLUMN DIM_HOSPITAL.esfera IS 'Esfera administrativa (ex: público, privado, filantrópico).';
-COMMENT ON COLUMN DIM_HOSPITAL.percentual_sus IS 'Percentual de leitos SUS em relação ao total.';
-COMMENT ON COLUMN DIM_HOSPITAL.latitude IS 'Latitude da localização do hospital.';
-COMMENT ON COLUMN DIM_HOSPITAL.longitude IS 'Longitude da localização do hospital.';
-
--- ============================================================
--- 2. TABELA DIM_MUNICIPIO (Dimensão Municípios)
+-- 1. DIM_MUNICIPIO (Dimensao Municipios)
 -- ============================================================
 
 CREATE TABLE DIM_MUNICIPIO (
-    municipio_id        VARCHAR2(20) PRIMARY KEY,
-    nome_municipio      VARCHAR2(100),
-    latitude            NUMBER(10,6),
-    longitude           NUMBER(10,6),
-    distancia_media     NUMBER(10,2)
+    codigo_municipio NUMBER(6) NOT NULL,
+    nome_municipio VARCHAR2(100) NOT NULL,
+    uf VARCHAR2(2) NOT NULL,
+    estado VARCHAR2(50) NOT NULL,
+    latitude NUMBER(13,6),
+    longitude NUMBER(13,6)
 );
 
-COMMENT ON TABLE DIM_MUNICIPIO IS 'Dados dos municípios para análise regional.';
-COMMENT ON COLUMN DIM_MUNICIPIO.municipio_id IS 'Código do município (IBGE).';
-COMMENT ON COLUMN DIM_MUNICIPIO.nome_municipio IS 'Nome do município.';
-COMMENT ON COLUMN DIM_MUNICIPIO.latitude IS 'Latitude da localização do município.';
-COMMENT ON COLUMN DIM_MUNICIPIO.longitude IS 'Longitude da localização do município.';
-COMMENT ON COLUMN DIM_MUNICIPIO.distancia_media IS 'Distância média do município até o hospital de referência.';
+COMMENT ON TABLE DIM_MUNICIPIO IS 'Dimensao com dados dos municipios.';
+COMMENT ON COLUMN DIM_MUNICIPIO.codigo_municipio IS 'Codigo IBGE do municipio (6 digitos).';
+COMMENT ON COLUMN DIM_MUNICIPIO.nome_municipio IS 'Nome do municipio.';
+COMMENT ON COLUMN DIM_MUNICIPIO.uf IS 'UF do estado';
+COMMENT ON COLUMN DIM_MUNICIPIO.estado IS 'Nome do estado';
+COMMENT ON COLUMN DIM_MUNICIPIO.latitude IS 'Latitude da localizacao do municipio.';
+COMMENT ON COLUMN DIM_MUNICIPIO.longitude IS 'Longitude da localizacao do municipio.';
+
 
 -- ============================================================
--- 3. TABELA DIM_TEMPO (Dimensão Tempo)
+-- 2. DIM_HOSPITAL (Dimensao Hospitais)
+-- ============================================================
+
+CREATE TABLE DIM_HOSPITAL (
+    id_hospital VARCHAR2(7) PRIMARY KEY,
+    codigo_municipio VARCHAR2(6),
+    nome_municipio_hospital VARCHAR2(100) NOT NULL,
+    uf_hospital VARCHAR2(2),
+    estado_hospital VARCHAR2(50),
+    latitude_hospital NUMBER(13,6) DEFAULT 0,
+    longitude_hospital NUMBER(13,6) DEFAULT 0,
+    leitos_totais NUMBER DEFAULT 0,
+    leitos_sus NUMBER DEFAULT 0,
+    leitos_nao_sus NUMBER DEFAULT 0,
+    esfera VARCHAR2(50),
+    tipo_unidade VARCHAR2(50),
+    nivel_hierarquico VARCHAR2(50),
+    natureza_juridica VARCHAR2(50),
+    porte_hospitalar VARCHAR2(50),
+    alta_complexidade VARCHAR2(50),
+    percentual_sus NUMBER(6,2) DEFAULT 0
+);
+
+COMMENT ON TABLE DIM_HOSPITAL IS 'Dimensao com dados dos hospitais.';
+COMMENT ON COLUMN DIM_HOSPITAL.id_hospital IS 'Codigo CNES do hospital (7 digitos).';
+COMMENT ON COLUMN DIM_HOSPITAL.codigo_municipio IS 'Codigo do municipio onde o hospital esta localizado.';
+COMMENT ON COLUMN DIM_HOSPITAL.nome_municipio_hospital IS 'Nome do municipio do hospital.';
+COMMENT ON COLUMN DIM_HOSPITAL.uf_hospital IS 'UF onde o hospital esta localizado.';
+COMMENT ON COLUMN DIM_HOSPITAL.estado_hospital IS 'Nome do estado do hospital.';
+COMMENT ON COLUMN DIM_HOSPITAL.latitude_hospital IS 'Latitude da localizacao do hospital.';
+COMMENT ON COLUMN DIM_HOSPITAL.longitude_hospital IS 'Longitude da localizacao do hospital.';
+COMMENT ON COLUMN DIM_HOSPITAL.leitos_totais IS 'Numero total de leitos do hospital.';
+COMMENT ON COLUMN DIM_HOSPITAL.leitos_sus IS 'Numero de leitos SUS.';
+COMMENT ON COLUMN DIM_HOSPITAL.leitos_nao_sus IS 'Numero de leitos nao SUS.';
+COMMENT ON COLUMN DIM_HOSPITAL.esfera IS 'Esfera administrativa (E/M/F).';
+COMMENT ON COLUMN DIM_HOSPITAL.tipo_unidade IS 'Tipo da unidade hospitalar.';
+COMMENT ON COLUMN DIM_HOSPITAL.nivel_hierarquico IS 'Nivel hierarquico do hospital.';
+COMMENT ON COLUMN DIM_HOSPITAL.natureza_juridica IS 'Natureza juridica do hospital.';
+COMMENT ON COLUMN DIM_HOSPITAL.porte_hospitalar IS 'Porte do hospital (Micro, Pequeno, Medio, Grande).';
+COMMENT ON COLUMN DIM_HOSPITAL.alta_complexidade IS 'Indica se o hospital realiza procedimentos de alta complexidade.';
+COMMENT ON COLUMN DIM_HOSPITAL.percentual_sus IS 'Percentual de leitos SUS em relacao ao total.';
+
+
+-- ============================================================
+-- 3. DIM_TEMPO (Dimensao Tempo)
 -- ============================================================
 
 CREATE TABLE DIM_TEMPO (
-    tempo_id            NUMBER PRIMARY KEY,
-    data_referencia     DATE NOT NULL,
-    ano                 NUMBER(4),
-    mes                 NUMBER(2),
-    ano_mes             VARCHAR2(7)
+    tempo_id NUMBER PRIMARY KEY,
+    data_referencia DATE NOT NULL,
+    ano NUMBER(4) NOT NULL,
+    mes NUMBER(2) NOT NULL,
+    trimestre NUMBER(1) NOT NULL,
+    dia_semana VARCHAR2(20),
+    ano_mes VARCHAR2(7) NOT NULL
 );
 
-COMMENT ON TABLE DIM_TEMPO IS 'Dimensão de tempo para análise histórica e projeções.';
-COMMENT ON COLUMN DIM_TEMPO.tempo_id IS 'Identificador único da data.';
-COMMENT ON COLUMN DIM_TEMPO.data_referencia IS 'Data de referência (geralmente início do mês).';
-COMMENT ON COLUMN DIM_TEMPO.ano IS 'Ano da data de referência.';
-COMMENT ON COLUMN DIM_TEMPO.mes IS 'Mês da data de referência (1-12).';
-COMMENT ON COLUMN DIM_TEMPO.ano_mes IS 'Ano-mês (ex: 2024-01).';
+COMMENT ON TABLE DIM_TEMPO IS 'Dimensao com datas e periodos.';
+COMMENT ON COLUMN DIM_TEMPO.tempo_id IS 'Identificador unico da data.';
+COMMENT ON COLUMN DIM_TEMPO.data_referencia IS 'Data de referencia.';
+COMMENT ON COLUMN DIM_TEMPO.ano IS 'Ano da data.';
+COMMENT ON COLUMN DIM_TEMPO.mes IS 'Mes da data (1-12).';
+COMMENT ON COLUMN DIM_TEMPO.trimestre IS 'Trimestre do ano (1-4).';
+COMMENT ON COLUMN DIM_TEMPO.dia_semana IS 'Dia da semana.';
+COMMENT ON COLUMN DIM_TEMPO.ano_mes IS 'Ano-mes (ex: 2024-01).';
+
 
 -- ============================================================
--- 4. TABELA FATO_INTERNACAO (Fato Internações)
+-- 4. FATO_INTERNACAO (Fato Internacoes)
 -- ============================================================
 
 CREATE TABLE FATO_INTERNACAO (
-    internacao_id       NUMBER PRIMARY KEY,
-    hospital_id         VARCHAR2(50) NOT NULL,
-    municipio_id        VARCHAR2(20) NOT NULL,
-    tempo_id            NUMBER NOT NULL,
-    diagnostico         VARCHAR2(20),
-    data_saida          DATE,
-    valor               NUMBER(15,2),
-    dias_internacao     NUMBER,
-    viajou              VARCHAR2(3),
-    tipo_leito          VARCHAR2(50),
-    tipo_unidade        VARCHAR2(50),
-    CONSTRAINT fk_fato_hospital FOREIGN KEY (hospital_id) REFERENCES DIM_HOSPITAL(hospital_id),
-    CONSTRAINT fk_fato_municipio FOREIGN KEY (municipio_id) REFERENCES DIM_MUNICIPIO(municipio_id),
+    internacao_id NUMBER PRIMARY KEY,
+    id_hospital VARCHAR2(7) NOT NULL,
+    codigo_municipio_paciente VARCHAR2(6),
+    tempo_id NUMBER NOT NULL,
+    codigo_diagnostico VARCHAR2(20),
+    data_internacao DATE NOT NULL,
+    data_saida DATE,
+    valor_procedimento NUMBER(15,2) DEFAULT 0,
+    dias_internacao NUMBER DEFAULT 0,
+    paciente_viajou VARCHAR2(3),
+    nome_municipio_paciente VARCHAR2(100),
+    uf_paciente VARCHAR2(2),
+    estado_paciente VARCHAR2(50),
+    latitude_paciente NUMBER(13,6) DEFAULT 0,
+    longitude_paciente NUMBER(13,6) DEFAULT 0,
+    nome_municipio_hospital VARCHAR2(100),
+    latitude_hospital NUMBER(13,6) DEFAULT 0,
+    longitude_hospital NUMBER(13,6) DEFAULT 0,
+    distancia_estimada_km NUMBER(10,2) DEFAULT 0,
+    ano_competencia NUMBER(4),
+    mes_competencia NUMBER(2),
+    dia_semana VARCHAR2(20),
+    tipo_dia VARCHAR2(20),
+    CONSTRAINT fk_fato_hospital FOREIGN KEY (id_hospital) REFERENCES DIM_HOSPITAL(id_hospital),
     CONSTRAINT fk_fato_tempo FOREIGN KEY (tempo_id) REFERENCES DIM_TEMPO(tempo_id)
 );
 
-COMMENT ON TABLE FATO_INTERNACAO IS 'Fato de internações hospitalares para análise de capacidade e perfil de atendimento.';
-COMMENT ON COLUMN FATO_INTERNACAO.internacao_id IS 'Identificador único da internação.';
-COMMENT ON COLUMN FATO_INTERNACAO.hospital_id IS 'Referência ao hospital (DIM_HOSPITAL).';
-COMMENT ON COLUMN FATO_INTERNACAO.municipio_id IS 'Referência ao município (DIM_MUNICIPIO).';
-COMMENT ON COLUMN FATO_INTERNACAO.tempo_id IS 'Referência à data (DIM_TEMPO).';
-COMMENT ON COLUMN FATO_INTERNACAO.diagnostico IS 'Código CID do diagnóstico da internação.';
-COMMENT ON COLUMN FATO_INTERNACAO.data_saida IS 'Data de alta do paciente.';
-COMMENT ON COLUMN FATO_INTERNACAO.valor IS 'Valor total do procedimento ou internação.';
-COMMENT ON COLUMN FATO_INTERNACAO.dias_internacao IS 'Número de dias de permanência.';
-COMMENT ON COLUMN FATO_INTERNACAO.viajou IS 'Indica se o paciente viajou para outro município para o atendimento.';
-COMMENT ON COLUMN FATO_INTERNACAO.tipo_leito IS 'Tipo de leito utilizado.';
-COMMENT ON COLUMN FATO_INTERNACAO.tipo_unidade IS 'Tipo de unidade de atendimento.';
+COMMENT ON TABLE FATO_INTERNACAO IS 'Fato de internacoes hospitalares.';
+COMMENT ON COLUMN FATO_INTERNACAO.internacao_id IS 'Identificador unico da internacao.';
+COMMENT ON COLUMN FATO_INTERNACAO.id_hospital IS 'Codigo CNES do hospital.';
+COMMENT ON COLUMN FATO_INTERNACAO.codigo_municipio_paciente IS 'Codigo do municipio do paciente.';
+COMMENT ON COLUMN FATO_INTERNACAO.tempo_id IS 'Referencia a dimensao de tempo.';
+COMMENT ON COLUMN FATO_INTERNACAO.codigo_diagnostico IS 'CID-10 do diagnostico principal.';
+COMMENT ON COLUMN FATO_INTERNACAO.data_internacao IS 'Data de internacao.';
+COMMENT ON COLUMN FATO_INTERNACAO.data_saida IS 'Data de alta.';
+COMMENT ON COLUMN FATO_INTERNACAO.valor_procedimento IS 'Valor do procedimento.';
+COMMENT ON COLUMN FATO_INTERNACAO.dias_internacao IS 'Numero de dias de permanencia.';
+COMMENT ON COLUMN FATO_INTERNACAO.paciente_viajou IS 'Indica se o paciente viajou para outro municipio.';
+COMMENT ON COLUMN FATO_INTERNACAO.nome_municipio_paciente IS 'Nome do municipio do paciente.';
+COMMENT ON COLUMN FATO_INTERNACAO.uf_paciente IS 'UF do paciente.';
+COMMENT ON COLUMN FATO_INTERNACAO.estado_paciente IS 'Estado do paciente.';
+COMMENT ON COLUMN FATO_INTERNACAO.latitude_paciente IS 'Latitude do municipio do paciente.';
+COMMENT ON COLUMN FATO_INTERNACAO.longitude_paciente IS 'Longitude do municipio do paciente.';
+COMMENT ON COLUMN FATO_INTERNACAO.nome_municipio_hospital IS 'Nome do municipio do hospital.';
+COMMENT ON COLUMN FATO_INTERNACAO.latitude_hospital IS 'Latitude do hospital.';
+COMMENT ON COLUMN FATO_INTERNACAO.longitude_hospital IS 'Longitude do hospital.';
+COMMENT ON COLUMN FATO_INTERNACAO.distancia_estimada_km IS 'Distancia estimada entre municipio do paciente e hospital.';
+COMMENT ON COLUMN FATO_INTERNACAO.ano_competencia IS 'Ano de competencia do SIH.';
+COMMENT ON COLUMN FATO_INTERNACAO.mes_competencia IS 'Mes de competencia do SIH.';
+COMMENT ON COLUMN FATO_INTERNACAO.dia_semana IS 'Dia da semana da internacao.';
+COMMENT ON COLUMN FATO_INTERNACAO.tipo_dia IS 'Tipo do dia (Dia Util / Fim de Semana).';
+
 
 -- ============================================================
--- FIM DO SCRIPT
+-- 5. CONSULTAS DE VERIFICACAO
 -- ============================================================
+
+-- Verificar estrutura das tabelas
+SELECT table_name, column_name, data_type, data_length, nullable
+FROM user_tab_columns
+WHERE table_name IN ('DIM_MUNICIPIO', 'DIM_HOSPITAL', 'DIM_TEMPO', 'FATO_INTERNACAO')
+ORDER BY table_name, column_id;
+
+-- Verificar constraints
+SELECT table_name, constraint_name, constraint_type, status
+FROM user_constraints
+WHERE table_name IN ('DIM_MUNICIPIO', 'DIM_HOSPITAL', 'DIM_TEMPO', 'FATO_INTERNACAO')
+ORDER BY table_name;
+
+
+-- ============================================================
+-- 6. EXEMPLO DE CONSULTA - TAXA DE OCUPACAO
+-- ============================================================
+
+/*
+SELECT 
+    h.id_hospital,
+    h.nome_municipio_hospital,
+    h.leitos_totais,
+    COUNT(f.internacao_id) AS leitos_ocupados,
+    ROUND((COUNT(f.internacao_id) / h.leitos_totais) * 100, 2) AS taxa_ocupacao_percentual
+FROM DIM_HOSPITAL h
+LEFT JOIN FATO_INTERNACAO f 
+    ON h.id_hospital = f.id_hospital
+    AND f.data_internacao <= DATE '2024-01-15'
+    AND f.data_saida >= DATE '2024-01-15'
+WHERE h.leitos_totais > 0
+GROUP BY h.id_hospital, h.nome_municipio_hospital, h.leitos_totais
+ORDER BY taxa_ocupacao_percentual DESC;
+*/
