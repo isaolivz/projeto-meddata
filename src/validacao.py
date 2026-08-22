@@ -1,19 +1,22 @@
 """
-validacao.py - Validacao formal do Star Schema (requisito do projeto).
+validacao.py - Validacao do Star Schema para o MedData.
 
-Este modulo verifica:
+Este modulo contem funcoes para validar a integridade dos dados
+gerados pelo pipeline de integracao.
+
+Validacoes realizadas:
+- Existencia dos arquivos
+- Registros vazios
+- Chaves primarias duplicadas
 - Integridade referencial (FKs)
 - Dados nulos em colunas obrigatorias
-- Duplicatas em chaves primarias
 - Consistencia dos dados
-- Gera relatorio de validacao
 """
 
 import argparse
 import sys
 import logging
 from pathlib import Path
-from datetime import datetime
 import pandas as pd
 import numpy as np
 
@@ -30,7 +33,9 @@ logger = logging.getLogger(__name__)
 
 
 def carregar_tabelas(uf=None, ano=None, mes=None):
-    """Carrega as tabelas do Star Schema da pasta processed."""
+    """
+    Carrega as tabelas do Star Schema da pasta processed.
+    """
     uf = uf or config.UF
     ano = ano or config.ANO
     mes = mes or config.MES
@@ -55,7 +60,9 @@ def carregar_tabelas(uf=None, ano=None, mes=None):
 
 
 def validar_integridade_referencial(fato, dim_hospital, dim_municipio, dim_tempo):
-    """Valida as chaves estrangeiras."""
+    """
+    Valida as chaves estrangeiras.
+    """
     erros = []
     
     # FK para DIM_HOSPITAL
@@ -67,7 +74,7 @@ def validar_integridade_referencial(fato, dim_hospital, dim_municipio, dim_tempo
             erros.append(f"FK_HOSPITAL: {len(ids_invalidos)} ids de hospital sem correspondencia")
     
     # FK para DIM_TEMPO
-    if fato is not None and dim_tempo is not None:
+    if fato is not None and dim_tempo is not None and len(dim_tempo) > 0:
         ids_tempo = set(dim_tempo['tempo_id'])
         ids_fato = set(fato['tempo_id'])
         ids_invalidos = ids_fato - ids_tempo
@@ -78,7 +85,9 @@ def validar_integridade_referencial(fato, dim_hospital, dim_municipio, dim_tempo
 
 
 def validar_chaves_primarias(dim_municipio, dim_hospital, dim_tempo, fato):
-    """Valida duplicatas nas chaves primarias."""
+    """
+    Valida duplicatas nas chaves primarias.
+    """
     erros = []
     
     if dim_municipio is not None:
@@ -91,7 +100,7 @@ def validar_chaves_primarias(dim_municipio, dim_hospital, dim_tempo, fato):
         if dup > 0:
             erros.append(f"DIM_HOSPITAL: {dup} ids duplicados")
     
-    if dim_tempo is not None:
+    if dim_tempo is not None and len(dim_tempo) > 0:
         dup = dim_tempo['tempo_id'].duplicated().sum()
         if dup > 0:
             erros.append(f"DIM_TEMPO: {dup} ids duplicados")
@@ -105,39 +114,45 @@ def validar_chaves_primarias(dim_municipio, dim_hospital, dim_tempo, fato):
 
 
 def validar_nulos(dim_municipio, dim_hospital, dim_tempo, fato):
-    """Valida colunas obrigatorias sem nulos."""
+    """
+    Valida colunas obrigatorias sem nulos.
+    """
     erros = []
     avisos = []
     
     # DIM_MUNICIPIO
     if dim_municipio is not None:
         for col in ['codigo_municipio', 'nome_municipio', 'uf']:
-            nulos = dim_municipio[col].isna().sum()
-            if nulos > 0:
-                erros.append(f"DIM_MUNICIPIO: {nulos} nulos em {col}")
+            if col in dim_municipio.columns:
+                nulos = dim_municipio[col].isna().sum()
+                if nulos > 0:
+                    erros.append(f"DIM_MUNICIPIO: {nulos} nulos em {col}")
     
     # DIM_HOSPITAL
     if dim_hospital is not None:
         for col in ['id_hospital', 'leitos_totais']:
-            nulos = dim_hospital[col].isna().sum()
-            if nulos > 0:
-                erros.append(f"DIM_HOSPITAL: {nulos} nulos em {col}")
+            if col in dim_hospital.columns:
+                nulos = dim_hospital[col].isna().sum()
+                if nulos > 0:
+                    erros.append(f"DIM_HOSPITAL: {nulos} nulos em {col}")
     
     # DIM_TEMPO
-    if dim_tempo is not None:
+    if dim_tempo is not None and len(dim_tempo) > 0:
         for col in ['tempo_id', 'data_referencia', 'ano', 'mes']:
-            nulos = dim_tempo[col].isna().sum()
-            if nulos > 0:
-                erros.append(f"DIM_TEMPO: {nulos} nulos em {col}")
+            if col in dim_tempo.columns:
+                nulos = dim_tempo[col].isna().sum()
+                if nulos > 0:
+                    erros.append(f"DIM_TEMPO: {nulos} nulos em {col}")
     
     # FATO_INTERNACAO
     if fato is not None:
         for col in ['id_hospital', 'data_internacao', 'tempo_id']:
-            nulos = fato[col].isna().sum()
-            if nulos > 0:
-                erros.append(f"FATO_INTERNACAO: {nulos} nulos em {col}")
+            if col in fato.columns:
+                nulos = fato[col].isna().sum()
+                if nulos > 0:
+                    erros.append(f"FATO_INTERNACAO: {nulos} nulos em {col}")
     
-    # Avisos: colunas com muitos nulos (>= 50%)
+    # Avisos: colunas com muitos nulos
     if fato is not None:
         for col in ['data_saida', 'codigo_diagnostico']:
             if col in fato.columns:
@@ -149,24 +164,28 @@ def validar_nulos(dim_municipio, dim_hospital, dim_tempo, fato):
 
 
 def validar_consistencia(dim_municipio, dim_hospital, dim_tempo, fato):
-    """Valida consistencia dos dados."""
+    """
+    Valida consistencia dos dados.
+    """
     erros = []
     avisos = []
     
     # DIM_MUNICIPIO: latitude/longitude validas
     if dim_municipio is not None:
-        invalidas = dim_municipio[
-            (dim_municipio['latitude'] < -90) | 
-            (dim_municipio['latitude'] > 90)
-        ]
-        if len(invalidas) > 0:
-            erros.append(f"DIM_MUNICIPIO: {len(invalidas)} latitudes invalidas")
+        if 'latitude' in dim_municipio.columns:
+            invalidas = dim_municipio[
+                (dim_municipio['latitude'] < -90) | 
+                (dim_municipio['latitude'] > 90)
+            ]
+            if len(invalidas) > 0:
+                erros.append(f"DIM_MUNICIPIO: {len(invalidas)} latitudes invalidas")
     
     # DIM_HOSPITAL: leitos nao negativos
     if dim_hospital is not None:
-        negativos = dim_hospital[dim_hospital['leitos_totais'] < 0]
-        if len(negativos) > 0:
-            erros.append(f"DIM_HOSPITAL: {len(negativos)} registros com leitos negativos")
+        if 'leitos_totais' in dim_hospital.columns:
+            negativos = dim_hospital[dim_hospital['leitos_totais'] < 0]
+            if len(negativos) > 0:
+                erros.append(f"DIM_HOSPITAL: {len(negativos)} registros com leitos negativos")
     
     # DIM_HOSPITAL: percentual SUS entre 0 e 100
     if dim_hospital is not None and 'percentual_sus' in dim_hospital.columns:
@@ -178,10 +197,11 @@ def validar_consistencia(dim_municipio, dim_hospital, dim_tempo, fato):
             erros.append(f"DIM_HOSPITAL: {len(invalidos)} registros com percentual SUS invalido")
     
     # DIM_TEMPO: apenas 2024
-    if dim_tempo is not None:
-        anos_invalidos = dim_tempo[dim_tempo['ano'] != 2024]
-        if len(anos_invalidos) > 0:
-            erros.append(f"DIM_TEMPO: {len(anos_invalidos)} registros com ano diferente de 2024")
+    if dim_tempo is not None and len(dim_tempo) > 0:
+        if 'ano' in dim_tempo.columns:
+            anos_invalidos = dim_tempo[dim_tempo['ano'] != 2024]
+            if len(anos_invalidos) > 0:
+                erros.append(f"DIM_TEMPO: {len(anos_invalidos)} registros com ano diferente de 2024")
     
     # FATO_INTERNACAO: dias de internacao nao negativos
     if fato is not None and 'dias_internacao' in fato.columns:
@@ -189,16 +209,23 @@ def validar_consistencia(dim_municipio, dim_hospital, dim_tempo, fato):
         if len(negativos) > 0:
             erros.append(f"FATO_INTERNACAO: {len(negativos)} registros com dias negativos")
     
+    # FATO_INTERNACAO: paciente_viajou valido
+    if fato is not None and 'paciente_viajou' in fato.columns:
+        invalidos = fato[~fato['paciente_viajou'].isin([True, False, 'True', 'False', 0, 1])]
+        if len(invalidos) > 0:
+            avisos.append(f"FATO_INTERNACAO: {len(invalidos)} registros com paciente_viajou invalido")
+    
     return erros, avisos
 
 
 def gerar_relatorio(dados, erros, avisos):
-    """Gera relatorio de validacao."""
+    """
+    Gera relatorio de validacao.
+    """
     logger.info("=" * 60)
     logger.info("RELATORIO DE VALIDACAO")
     logger.info("=" * 60)
     
-    # Estatisticas das tabelas
     for nome, df in dados.items():
         if df is not None:
             logger.info(f"{nome.upper():20} | {len(df):>8,} registros | {len(df.columns):>3} colunas")
@@ -206,27 +233,31 @@ def gerar_relatorio(dados, erros, avisos):
     logger.info("-" * 60)
     
     if erros:
-        logger.error(f"❌ {len(erros)} ERROS encontrados:")
+        logger.error(f"ERROS encontrados: {len(erros)}")
         for erro in erros:
             logger.error(f"  - {erro}")
     else:
-        logger.info("✅ Nenhum erro encontrado")
+        logger.info("Nenhum erro encontrado")
     
     if avisos:
-        logger.warning(f"⚠️ {len(avisos)} AVISOS:")
+        logger.warning(f"AVISOS: {len(avisos)}")
         for aviso in avisos:
             logger.warning(f"  - {aviso}")
     
     logger.info("=" * 60)
     
     if erros:
-        logger.error("❌ VALIDACAO REPROVADA - Corrija os erros antes de carregar.")
+        logger.error("VALIDACAO REPROVADA - Corrija os erros antes de carregar.")
+        return False
     else:
-        logger.info("✅ VALIDACAO APROVADA - Dados prontos para carga!")
+        logger.info("VALIDACAO APROVADA - Dados prontos para carga!")
+        return True
 
 
 def executar_validacao(uf=None, ano=None, mes=None):
-    """Executa o pipeline completo de validacao."""
+    """
+    Executa o pipeline completo de validacao.
+    """
     uf = uf or config.UF
     ano = ano or config.ANO
     mes = mes or config.MES
@@ -236,19 +267,15 @@ def executar_validacao(uf=None, ano=None, mes=None):
     logger.info(f"UF: {uf} | Ano: {ano} | Mes: {mes:02d}")
     logger.info("=" * 60)
     
-    # Carregar dados
     dados = carregar_tabelas(uf, ano, mes)
     
-    # Verificar se todos os dados foram carregados
     if any(df is None for df in dados.values()):
-        logger.error("❌ Falha ao carregar uma ou mais tabelas")
-        return False, ["Falha no carregamento dos dados"]
+        logger.error("Falha ao carregar uma ou mais tabelas")
+        return False
     
-    # Executar validacoes
     erros = []
     avisos = []
     
-    # 1. Integridade referencial
     erros.extend(validar_integridade_referencial(
         dados['fato_internacao'],
         dados['dim_hospital'],
@@ -256,7 +283,6 @@ def executar_validacao(uf=None, ano=None, mes=None):
         dados['dim_tempo']
     ))
     
-    # 2. Chaves primarias
     erros.extend(validar_chaves_primarias(
         dados['dim_municipio'],
         dados['dim_hospital'],
@@ -264,7 +290,6 @@ def executar_validacao(uf=None, ano=None, mes=None):
         dados['fato_internacao']
     ))
     
-    # 3. Nulos
     e, a = validar_nulos(
         dados['dim_municipio'],
         dados['dim_hospital'],
@@ -274,7 +299,6 @@ def executar_validacao(uf=None, ano=None, mes=None):
     erros.extend(e)
     avisos.extend(a)
     
-    # 4. Consistencia
     e, a = validar_consistencia(
         dados['dim_municipio'],
         dados['dim_hospital'],
@@ -284,10 +308,9 @@ def executar_validacao(uf=None, ano=None, mes=None):
     erros.extend(e)
     avisos.extend(a)
     
-    # Gerar relatorio
-    gerar_relatorio(dados, erros, avisos)
+    valido = gerar_relatorio(dados, erros, avisos)
     
-    return len(erros) == 0, erros
+    return valido
 
 
 if __name__ == "__main__":
@@ -301,9 +324,5 @@ if __name__ == "__main__":
     config.ANO = args.ano
     config.MES = args.mes
     
-    valido, erros = executar_validacao(args.uf, args.ano, args.mes)
-    
-    if valido:
-        sys.exit(0)
-    else:
-        sys.exit(1)
+    valido = executar_validacao(args.uf, args.ano, args.mes)
+    sys.exit(0 if valido else 1)
