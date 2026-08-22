@@ -18,6 +18,7 @@ import argparse
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from typing import Dict
 import logging
 import sys
 
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 # FUNCAO DE UPLOAD PARA OBJECT STORAGE
 # ================================================================
 
-def upload_para_object_storage(arquivo_local, objeto_name, bucket="meddata-gold"):
+def upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: str = "meddata-gold") -> bool:
     """Faz upload de um arquivo para o Object Storage da OCI."""
     try:
         import oci
@@ -62,7 +63,7 @@ def upload_para_object_storage(arquivo_local, objeto_name, bucket="meddata-gold"
 # 1. GERAR DIM_MUNICIPIO (COM UF E ESTADO)
 # ================================================================
 
-def gerar_dim_municipio(df_ibge):
+def gerar_dim_municipio(df_ibge: pd.DataFrame) -> pd.DataFrame:
     """
     Gera a dimensao de municipios a partir do IBGE.
 
@@ -108,7 +109,7 @@ def gerar_dim_municipio(df_ibge):
 # 2. GERAR DIM_HOSPITAL
 # ================================================================
 
-def gerar_dim_hospital(df_cnes, df_municipios):
+def gerar_dim_hospital(df_cnes: pd.DataFrame, df_municipios: pd.DataFrame) -> pd.DataFrame:
     """
     Gera a dimensao de hospitais a partir do CNES.
     """
@@ -139,7 +140,7 @@ def gerar_dim_hospital(df_cnes, df_municipios):
     # Garantir que nao ha duplicatas
     dim = dim.drop_duplicates(subset=['id_hospital'])
 
-    # Reorganizar colunas (removendo leitos_contratados e esfera_classificacao)
+    # Reorganizar colunas
     colunas_ordem = [
         'id_hospital',
         'codigo_municipio',
@@ -149,10 +150,12 @@ def gerar_dim_hospital(df_cnes, df_municipios):
         'latitude_hospital',
         'longitude_hospital',
         'leitos_totais',
+        'leitos_contratados',
         'leitos_sus',
         'leitos_nao_sus',
         'porte_hospitalar',
         'alta_complexidade',
+        'esfera_classificacao',
         'percentual_sus'
     ]
 
@@ -167,10 +170,9 @@ def gerar_dim_hospital(df_cnes, df_municipios):
 # 3. GERAR DIM_TEMPO
 # ================================================================
 
-def gerar_dim_tempo(df_sih):
+def gerar_dim_tempo(df_sih: pd.DataFrame) -> pd.DataFrame:
     """
     Gera a dimensao de tempo a partir das datas do SIH.
-    Filtra apenas datas de 2024.
     """
     logger.info("Gerando DIM_TEMPO...")
 
@@ -193,18 +195,10 @@ def gerar_dim_tempo(df_sih):
         'ano_mes': datas_unicas.dt.strftime('%Y-%m')
     })
 
-    # FILTRAR APENAS 2024
-    dim = dim[dim['ano'] == 2024]
-    logger.info(f"Datas apos filtro 2024: {len(dim):,}")
-
-    if len(dim) == 0:
-        logger.warning("Nenhuma data de 2024 encontrada.")
-        return pd.DataFrame(columns=['data_referencia', 'ano', 'mes', 'trimestre', 'dia_semana', 'ano_mes', 'tempo_id'])
-
     dim['tempo_id'] = range(1, len(dim) + 1)
     dim = dim.sort_values('data_referencia').reset_index(drop=True)
 
-    logger.info(f"DIM_TEMPO gerada: {len(dim):,} datas unicas (apenas 2024)")
+    logger.info(f"DIM_TEMPO gerada: {len(dim):,} datas unicas")
     return dim
 
 
@@ -212,7 +206,12 @@ def gerar_dim_tempo(df_sih):
 # 4. GERAR FATO_INTERNACAO
 # ================================================================
 
-def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo):
+def gerar_fato_internacao(
+    df_sih: pd.DataFrame,
+    df_hospitais: pd.DataFrame,
+    df_municipios: pd.DataFrame,
+    df_tempo: pd.DataFrame
+) -> pd.DataFrame:
     """
     Gera a tabela fato de internacoes.
     """
@@ -333,7 +332,16 @@ def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo):
 # 5. SALVAR STAR SCHEMA
 # ================================================================
 
-def salvar_star_schema(dim_municipio, dim_hospital, dim_tempo, fato_internacao, uf=None, ano=None, mes=None, upload=True):
+def salvar_star_schema(
+    dim_municipio: pd.DataFrame,
+    dim_hospital: pd.DataFrame,
+    dim_tempo: pd.DataFrame,
+    fato_internacao: pd.DataFrame,
+    uf: str = None,
+    ano: int = None,
+    mes: int = None,
+    upload: bool = True
+) -> Dict[str, Path]:
     """Salva as quatro tabelas do Star Schema."""
     uf = uf or config.UF
     ano = ano or config.ANO
@@ -365,7 +373,16 @@ def salvar_star_schema(dim_municipio, dim_hospital, dim_tempo, fato_internacao, 
 # 6. GERAR STAR SCHEMA (PIPELINE COMPLETO)
 # ================================================================
 
-def gerar_star_schema(df_sih, df_cnes, df_ibge, uf=None, ano=None, mes=None, salvar=True, upload=True):
+def gerar_star_schema(
+    df_sih: pd.DataFrame,
+    df_cnes: pd.DataFrame,
+    df_ibge: pd.DataFrame,
+    uf: str = None,
+    ano: int = None,
+    mes: int = None,
+    salvar: bool = True,
+    upload: bool = True
+) -> Dict[str, pd.DataFrame]:
     """Executa o pipeline completo de geracao do Star Schema."""
     uf = uf or config.UF
     ano = ano or config.ANO

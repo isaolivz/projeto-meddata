@@ -1,164 +1,309 @@
 """
-Módulo de validação de dados para o projeto MedData.
+validacao.py - Validacao formal do Star Schema (requisito do projeto).
 
-Este módulo contém funções para validar a qualidade e integridade
-dos dados transformados.
-
-Uso:
-    from validacao import ValidadorDados
-    
-    validador = ValidadorDados()
-    relatorio = validador.validar_dataset(df, 'sih')
+Este modulo verifica:
+- Integridade referencial (FKs)
+- Dados nulos em colunas obrigatorias
+- Duplicatas em chaves primarias
+- Consistencia dos dados
+- Gera relatorio de validacao
 """
 
+import argparse
+import sys
+import logging
+from pathlib import Path
+from datetime import datetime
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Any
+
+sys.path.append(str(Path(__file__).parent))
+sys.path.append(str(Path(__file__).parent.parent))
+
+from config import config
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
-class ValidadorDados:
-    """
-    Classe para validação de dados do MedData.
-    """
-    
-    def __init__(self):
-        """Inicializa o validador."""
-        self.regras = {
-            'sih': self._regras_sih,
-            'cnes': self._regras_cnes,
-            'ibge': self._regras_ibge,
-            'integrado': self._regras_integrado,
-        }
-    
-    def validar_dataset(self, df: pd.DataFrame, nome: str) -> Dict[str, Any]:
-        """
-        Valida um dataset baseado em seu nome.
-        
-        Args:
-            df: DataFrame a validar
-            nome: Nome do dataset ('sih', 'cnes', 'ibge', 'integrado')
-            
-        Returns:
-            Dicionário com resultados da validação
-        """
-        if nome in self.regras:
-            return self.regras[nome](df)
+def carregar_tabelas(uf=None, ano=None, mes=None):
+    """Carrega as tabelas do Star Schema da pasta processed."""
+    uf = uf or config.UF
+    ano = ano or config.ANO
+    mes = mes or config.MES
+
+    caminhos = {
+        'dim_municipio': config.PROCESSED_DIR / f"dim_municipio_{uf}_{ano}_{mes:02d}.parquet",
+        'dim_hospital': config.PROCESSED_DIR / f"dim_hospital_{uf}_{ano}_{mes:02d}.parquet",
+        'dim_tempo': config.PROCESSED_DIR / f"dim_tempo_{uf}_{ano}_{mes:02d}.parquet",
+        'fato_internacao': config.PROCESSED_DIR / f"fato_internacao_{uf}_{ano}_{mes:02d}.parquet"
+    }
+
+    dados = {}
+    for nome, caminho in caminhos.items():
+        if caminho.exists():
+            dados[nome] = pd.read_parquet(caminho)
+            logger.info(f"Carregado: {nome} ({len(dados[nome]):,} registros)")
         else:
-            return self._validar_generico(df, nome)
+            logger.error(f"Arquivo nao encontrado: {caminho}")
+            dados[nome] = None
+
+    return dados
+
+
+def validar_integridade_referencial(fato, dim_hospital, dim_municipio, dim_tempo):
+    """Valida as chaves estrangeiras."""
+    erros = []
     
-    def _validar_generico(self, df: pd.DataFrame, nome: str) -> Dict[str, Any]:
-        """Validação genérica para qualquer dataset."""
-        return {
-            'nome': nome,
-            'registros': len(df),
-            'colunas': len(df.columns),
-            'nulos': df.isnull().sum().sum(),
-            'duplicatas': df.duplicated().sum(),
-            'status': 'OK' if len(df) > 0 else 'FALHA'
-        }
+    # FK para DIM_HOSPITAL
+    if fato is not None and dim_hospital is not None:
+        ids_hospitais = set(dim_hospital['id_hospital'])
+        ids_fato = set(fato['id_hospital'])
+        ids_invalidos = ids_fato - ids_hospitais
+        if ids_invalidos:
+            erros.append(f"FK_HOSPITAL: {len(ids_invalidos)} ids de hospital sem correspondencia")
     
-    def _regras_sih(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """Validação específica para SIH."""
-        relatorio = self._validar_generico(df, 'sih')
-        
-        # Colunas obrigatórias
-        colunas_obrigatorias = [
-            'codigo_municipio', 'id_hospital', 'codigo_diagnostico',
-            'data_internacao', 'data_saida', 'valor_procedimento',
-            'codigo_municipio_paciente'
+    # FK para DIM_TEMPO
+    if fato is not None and dim_tempo is not None:
+        ids_tempo = set(dim_tempo['tempo_id'])
+        ids_fato = set(fato['tempo_id'])
+        ids_invalidos = ids_fato - ids_tempo
+        if ids_invalidos:
+            erros.append(f"FK_TEMPO: {len(ids_invalidos)} ids de tempo sem correspondencia")
+    
+    return erros
+
+
+def validar_chaves_primarias(dim_municipio, dim_hospital, dim_tempo, fato):
+    """Valida duplicatas nas chaves primarias."""
+    erros = []
+    
+    if dim_municipio is not None:
+        dup = dim_municipio['codigo_municipio'].duplicated().sum()
+        if dup > 0:
+            erros.append(f"DIM_MUNICIPIO: {dup} codigos duplicados")
+    
+    if dim_hospital is not None:
+        dup = dim_hospital['id_hospital'].duplicated().sum()
+        if dup > 0:
+            erros.append(f"DIM_HOSPITAL: {dup} ids duplicados")
+    
+    if dim_tempo is not None:
+        dup = dim_tempo['tempo_id'].duplicated().sum()
+        if dup > 0:
+            erros.append(f"DIM_TEMPO: {dup} ids duplicados")
+    
+    if fato is not None:
+        dup = fato['internacao_id'].duplicated().sum()
+        if dup > 0:
+            erros.append(f"FATO_INTERNACAO: {dup} ids duplicados")
+    
+    return erros
+
+
+def validar_nulos(dim_municipio, dim_hospital, dim_tempo, fato):
+    """Valida colunas obrigatorias sem nulos."""
+    erros = []
+    avisos = []
+    
+    # DIM_MUNICIPIO
+    if dim_municipio is not None:
+        for col in ['codigo_municipio', 'nome_municipio', 'uf']:
+            nulos = dim_municipio[col].isna().sum()
+            if nulos > 0:
+                erros.append(f"DIM_MUNICIPIO: {nulos} nulos em {col}")
+    
+    # DIM_HOSPITAL
+    if dim_hospital is not None:
+        for col in ['id_hospital', 'leitos_totais']:
+            nulos = dim_hospital[col].isna().sum()
+            if nulos > 0:
+                erros.append(f"DIM_HOSPITAL: {nulos} nulos em {col}")
+    
+    # DIM_TEMPO
+    if dim_tempo is not None:
+        for col in ['tempo_id', 'data_referencia', 'ano', 'mes']:
+            nulos = dim_tempo[col].isna().sum()
+            if nulos > 0:
+                erros.append(f"DIM_TEMPO: {nulos} nulos em {col}")
+    
+    # FATO_INTERNACAO
+    if fato is not None:
+        for col in ['id_hospital', 'data_internacao', 'tempo_id']:
+            nulos = fato[col].isna().sum()
+            if nulos > 0:
+                erros.append(f"FATO_INTERNACAO: {nulos} nulos em {col}")
+    
+    # Avisos: colunas com muitos nulos (>= 50%)
+    if fato is not None:
+        for col in ['data_saida', 'codigo_diagnostico']:
+            if col in fato.columns:
+                nulos = fato[col].isna().sum()
+                if nulos > 0 and (nulos / len(fato)) > 0.5:
+                    avisos.append(f"FATO_INTERNACAO: {nulos} nulos em {col} ({nulos/len(fato)*100:.1f}%)")
+    
+    return erros, avisos
+
+
+def validar_consistencia(dim_municipio, dim_hospital, dim_tempo, fato):
+    """Valida consistencia dos dados."""
+    erros = []
+    avisos = []
+    
+    # DIM_MUNICIPIO: latitude/longitude validas
+    if dim_municipio is not None:
+        invalidas = dim_municipio[
+            (dim_municipio['latitude'] < -90) | 
+            (dim_municipio['latitude'] > 90)
         ]
-        
-        colunas_faltando = [col for col in colunas_obrigatorias if col not in df.columns]
-        relatorio['colunas_faltando'] = colunas_faltando
-        
-        # Verificar datas
-        if 'data_internacao' in df.columns:
-            datas_invalidas = df['data_internacao'].isnull().sum()
-            relatorio['datas_invalidas'] = datas_invalidas
-        
-        # Verificar valores negativos
-        if 'valor_procedimento' in df.columns:
-            negativos = (df['valor_procedimento'] < 0).sum()
-            relatorio['valores_negativos'] = negativos
-        
-        # Status final
-        relatorio['status'] = 'OK' if (
-            len(df) > 0 and
-            len(colunas_faltando) == 0 and
-            relatorio.get('datas_invalidas', 0) == 0
-        ) else 'ATENCAO'
-        
-        return relatorio
+        if len(invalidas) > 0:
+            erros.append(f"DIM_MUNICIPIO: {len(invalidas)} latitudes invalidas")
     
-    def _regras_cnes(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """Validação específica para CNES."""
-        relatorio = self._validar_generico(df, 'cnes')
-        
-        # Colunas obrigatórias
-        colunas_obrigatorias = [
-            'id_hospital', 'codigo_municipio', 'total_leitos'
+    # DIM_HOSPITAL: leitos nao negativos
+    if dim_hospital is not None:
+        negativos = dim_hospital[dim_hospital['leitos_totais'] < 0]
+        if len(negativos) > 0:
+            erros.append(f"DIM_HOSPITAL: {len(negativos)} registros com leitos negativos")
+    
+    # DIM_HOSPITAL: percentual SUS entre 0 e 100
+    if dim_hospital is not None and 'percentual_sus' in dim_hospital.columns:
+        invalidos = dim_hospital[
+            (dim_hospital['percentual_sus'] < 0) | 
+            (dim_hospital['percentual_sus'] > 100)
         ]
-        
-        colunas_faltando = [col for col in colunas_obrigatorias if col not in df.columns]
-        relatorio['colunas_faltando'] = colunas_faltando
-        
-        # Verificar leitos
-        if 'total_leitos' in df.columns:
-            sem_leitos = (df['total_leitos'] == 0).sum()
-            relatorio['hospitais_sem_leitos'] = sem_leitos
-        
-        # Status final
-        relatorio['status'] = 'OK' if (
-            len(df) > 0 and
-            len(colunas_faltando) == 0
-        ) else 'ATENCAO'
-        
-        return relatorio
+        if len(invalidos) > 0:
+            erros.append(f"DIM_HOSPITAL: {len(invalidos)} registros com percentual SUS invalido")
     
-    def _regras_ibge(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """Validação específica para IBGE."""
-        relatorio = self._validar_generico(df, 'ibge')
-        
-        # Colunas obrigatórias
-        colunas_obrigatorias = [
-            'codigo_municipio', 'nome_municipio', 'latitude', 'longitude'
-        ]
-        
-        colunas_faltando = [col for col in colunas_obrigatorias if col not in df.columns]
-        relatorio['colunas_faltando'] = colunas_faltando
-        
-        # Status final
-        relatorio['status'] = 'OK' if (
-            len(df) > 0 and
-            len(colunas_faltando) == 0
-        ) else 'ATENCAO'
-        
-        return relatorio
+    # DIM_TEMPO: apenas 2024
+    if dim_tempo is not None:
+        anos_invalidos = dim_tempo[dim_tempo['ano'] != 2024]
+        if len(anos_invalidos) > 0:
+            erros.append(f"DIM_TEMPO: {len(anos_invalidos)} registros com ano diferente de 2024")
     
-    def _regras_integrado(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """Validação específica para dataset integrado."""
-        relatorio = self._validar_generico(df, 'integrado')
-        
-        # Verificar colunas chave
-        colunas_chave = ['id_hospital', 'codigo_municipio', 'data_internacao']
-        for col in colunas_chave:
-            if col in df.columns:
-                nulos = df[col].isnull().sum()
-                relatorio[f'{col}_nulos'] = nulos
-        
-        # Verificar integridade dos joins
-        if 'leitos_sus' in df.columns:
-            sem_leitos = df['leitos_sus'].isnull().sum()
-            relatorio['sem_dados_cnes'] = sem_leitos
-        
-        if 'latitude_hospital' in df.columns:
-            sem_coordenadas = df['latitude_hospital'].isnull().sum()
-            relatorio['sem_coordenadas'] = sem_coordenadas
-        
-        # Status final
-        relatorio['status'] = 'OK' if (
-            len(df) > 0 and
-            relatorio.get('sem_dados_cnes', len(df)) < len(df) * 0.3
-        ) else 'ATENCAO'
-        
-        return relatorio
+    # FATO_INTERNACAO: dias de internacao nao negativos
+    if fato is not None and 'dias_internacao' in fato.columns:
+        negativos = fato[fato['dias_internacao'] < 0]
+        if len(negativos) > 0:
+            erros.append(f"FATO_INTERNACAO: {len(negativos)} registros com dias negativos")
+    
+    return erros, avisos
+
+
+def gerar_relatorio(dados, erros, avisos):
+    """Gera relatorio de validacao."""
+    logger.info("=" * 60)
+    logger.info("RELATORIO DE VALIDACAO")
+    logger.info("=" * 60)
+    
+    # Estatisticas das tabelas
+    for nome, df in dados.items():
+        if df is not None:
+            logger.info(f"{nome.upper():20} | {len(df):>8,} registros | {len(df.columns):>3} colunas")
+    
+    logger.info("-" * 60)
+    
+    if erros:
+        logger.error(f"❌ {len(erros)} ERROS encontrados:")
+        for erro in erros:
+            logger.error(f"  - {erro}")
+    else:
+        logger.info("✅ Nenhum erro encontrado")
+    
+    if avisos:
+        logger.warning(f"⚠️ {len(avisos)} AVISOS:")
+        for aviso in avisos:
+            logger.warning(f"  - {aviso}")
+    
+    logger.info("=" * 60)
+    
+    if erros:
+        logger.error("❌ VALIDACAO REPROVADA - Corrija os erros antes de carregar.")
+    else:
+        logger.info("✅ VALIDACAO APROVADA - Dados prontos para carga!")
+
+
+def executar_validacao(uf=None, ano=None, mes=None):
+    """Executa o pipeline completo de validacao."""
+    uf = uf or config.UF
+    ano = ano or config.ANO
+    mes = mes or config.MES
+    
+    logger.info("=" * 60)
+    logger.info("INICIANDO VALIDACAO DO STAR SCHEMA")
+    logger.info(f"UF: {uf} | Ano: {ano} | Mes: {mes:02d}")
+    logger.info("=" * 60)
+    
+    # Carregar dados
+    dados = carregar_tabelas(uf, ano, mes)
+    
+    # Verificar se todos os dados foram carregados
+    if any(df is None for df in dados.values()):
+        logger.error("❌ Falha ao carregar uma ou mais tabelas")
+        return False, ["Falha no carregamento dos dados"]
+    
+    # Executar validacoes
+    erros = []
+    avisos = []
+    
+    # 1. Integridade referencial
+    erros.extend(validar_integridade_referencial(
+        dados['fato_internacao'],
+        dados['dim_hospital'],
+        dados['dim_municipio'],
+        dados['dim_tempo']
+    ))
+    
+    # 2. Chaves primarias
+    erros.extend(validar_chaves_primarias(
+        dados['dim_municipio'],
+        dados['dim_hospital'],
+        dados['dim_tempo'],
+        dados['fato_internacao']
+    ))
+    
+    # 3. Nulos
+    e, a = validar_nulos(
+        dados['dim_municipio'],
+        dados['dim_hospital'],
+        dados['dim_tempo'],
+        dados['fato_internacao']
+    )
+    erros.extend(e)
+    avisos.extend(a)
+    
+    # 4. Consistencia
+    e, a = validar_consistencia(
+        dados['dim_municipio'],
+        dados['dim_hospital'],
+        dados['dim_tempo'],
+        dados['fato_internacao']
+    )
+    erros.extend(e)
+    avisos.extend(a)
+    
+    # Gerar relatorio
+    gerar_relatorio(dados, erros, avisos)
+    
+    return len(erros) == 0, erros
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Validacao do Star Schema")
+    parser.add_argument('--uf', type=str, default=config.UF, help='UF do estado')
+    parser.add_argument('--ano', type=int, default=config.ANO, help='Ano dos dados')
+    parser.add_argument('--mes', type=int, default=config.MES, help='Mes dos dados')
+    args = parser.parse_args()
+    
+    config.UF = args.uf
+    config.ANO = args.ano
+    config.MES = args.mes
+    
+    valido, erros = executar_validacao(args.uf, args.ano, args.mes)
+    
+    if valido:
+        sys.exit(0)
+    else:
+        sys.exit(1)

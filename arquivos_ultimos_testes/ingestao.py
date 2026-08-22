@@ -7,6 +7,8 @@ from pysus import cnes
 from pathlib import Path
 import sys
 import os
+import tempfile
+from typing import Optional
 
 # Adiciona a pasta raiz ao path do Python
 sys.path.append(str(Path(__file__).parent.parent))
@@ -16,7 +18,15 @@ from config import config
 
 
 # FUNÇÃO DE UPLOAD PARA OBJECT STORAGE
+#----------------------------------------
 def upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: str = "meddata-bronze"):
+    """
+    Aqui nós queriamos que os arquivos salvos já fossem encaminhados
+    para o Object Storage pois usamos a VM da oracle que, através dos
+    scripts precisava de um fluxo.
+    """
+
+    #pesquisamos e configuramos, adicionamos tratamento de erros pra saber onde estava falhando
     try:
         config_oci = from_file()
         object_storage = oci.object_storage.ObjectStorageClient(config_oci)
@@ -32,8 +42,18 @@ def upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: st
         return False
 
 
-# FUNÇÃO QUE BAIXA SIH
-def baixar_sih(uf=None, ano=None, mes=None, upload=True):
+
+# 2. FUNÇÃO QUE BAIXA SIH
+#-----------------------------------------------
+def baixar_sih(
+    uf: str = None, 
+    ano: int = None, 
+    mes: int = None,
+    upload: bool = True
+) -> Optional[pd.DataFrame]: #irá retornar um DF ou None
+    """
+    Baixa dados do SIH/SUS e envia para o Object Storage.
+    """
     if uf is None:
         uf = config.UF
     if ano is None:
@@ -46,13 +66,17 @@ def baixar_sih(uf=None, ano=None, mes=None, upload=True):
     try:
         arquivos = sih(state=uf, year=ano, month=mes)
         if not arquivos:
-            print(f"[SIH] Nenhum arquivo encontrado para {uf} {ano}/{mes}")
-            return None
+            raise ValueError(f"Nenhum arquivo encontrado para {uf} {ano}/{mes}")
         
         df = pd.read_parquet(arquivos[0])
         print(f"[SIH] Carregado: {len(df):,} registros")
         
-        # Salvar na pasta RAW_DIR
+        # Salvar localmente (temporário)
+        with tempfile.NamedTemporaryFile(suffix=".parquet", delete=False) as tmp:
+            caminho_local = Path(tmp.name)
+            df.to_parquet(caminho_local, index=False)
+        
+        # Salvar na pasta RAW_DIR (backup local)
         caminho_raw = config.RAW_DIR / config.get_nome_arquivo('sih', uf=uf, ano=ano, mes=mes)
         df.to_parquet(caminho_raw, index=False)
         print(f"[SIH] Salvo localmente em: {caminho_raw}")
@@ -60,7 +84,12 @@ def baixar_sih(uf=None, ano=None, mes=None, upload=True):
         # Upload para Object Storage (Camada Bronze)
         if upload:
             objeto_name = f"sih/{uf}/{ano}/sih_{uf}_{ano}_{mes:02d}.parquet"
-            upload_para_object_storage(caminho_raw, objeto_name, "meddata-bronze")
+            upload_para_object_storage(caminho_local, objeto_name, "meddata-bronze")
+        
+        # Limpar arquivo temporário
+        os.remove(caminho_local)
+
+        ##ver se precisa do arquivo temp
         
         return df
     
@@ -69,8 +98,18 @@ def baixar_sih(uf=None, ano=None, mes=None, upload=True):
         return None
 
 
-# FUNÇÃO QUE BAIXA CNES
-def baixar_cnes_leitos(uf=None, ano=None, mes=None, upload=True):
+# ============================================================
+# 3. FUNÇÃO QUE BAIXA CNES
+# ============================================================
+def baixar_cnes_leitos(
+    uf: str = None,
+    ano: int = None,
+    mes: int = None,
+    upload: bool = True
+) -> Optional[pd.DataFrame]:
+    """
+    Baixa dados de leitos do CNES e envia para o Object Storage.
+    """
     if uf is None:
         uf = config.UF
     if ano is None:
@@ -83,11 +122,15 @@ def baixar_cnes_leitos(uf=None, ano=None, mes=None, upload=True):
     try:
         arquivos = cnes(state=uf, year=ano, month=mes, group="LT")
         if not arquivos:
-            print(f"[CNES] Nenhum arquivo encontrado para {uf} {ano}/{mes}")
-            return None
+            raise ValueError(f"Nenhum arquivo encontrado para {uf} {ano}/{mes}")
         
         df = pd.read_parquet(arquivos[0])
         print(f"[CNES] Carregado: {len(df):,} registros")
+        
+        # Salvar localmente (temporário)
+        with tempfile.NamedTemporaryFile(suffix=".parquet", delete=False) as tmp:
+            caminho_local = Path(tmp.name)
+            df.to_parquet(caminho_local, index=False)
         
         # Salvar na pasta RAW_DIR
         caminho_raw = config.RAW_DIR / config.get_nome_arquivo('cnes', uf=uf, ano=ano, mes=mes)
@@ -97,7 +140,9 @@ def baixar_cnes_leitos(uf=None, ano=None, mes=None, upload=True):
         # Upload para Object Storage
         if upload:
             objeto_name = f"cnes/{uf}/{ano}/cnes_{uf}_{ano}_{mes:02d}.parquet"
-            upload_para_object_storage(caminho_raw, objeto_name, "meddata-bronze")
+            upload_para_object_storage(caminho_local, objeto_name, "meddata-bronze")
+        
+        os.remove(caminho_local)
         
         return df
     
@@ -106,8 +151,17 @@ def baixar_cnes_leitos(uf=None, ano=None, mes=None, upload=True):
         return None
 
 
-# FUNÇÃO QUE BAIXA IBGE
-def baixar_ibge(uf=None, upload=True):
+# ============================================================
+# 4. FUNÇÃO QUE BAIXA IBGE
+# ============================================================
+##aqui 
+def baixar_ibge(
+    uf: str = None,
+    upload: bool = True
+) -> Optional[pd.DataFrame]:
+    """
+    Baixa dados de municípios do IBGE e envia para o Object Storage.
+    """
     uf = uf or config.UF
 
     print(f"[IBGE] Carregando dados para {uf}")
@@ -134,6 +188,7 @@ def baixar_ibge(uf=None, upload=True):
             50: 'MS', 51: 'MT', 52: 'GO', 53: 'DF'
         }
 
+        # Criar a coluna 'uf' a partir do 'codigo_uf'
         df['uf'] = df['codigo_uf'].map(codigo_para_uf).fillna('NA')
 
         print(f"[IBGE] Carregado: {len(df):,} municípios")
@@ -153,9 +208,18 @@ def baixar_ibge(uf=None, upload=True):
         print(f"[ERRO IBGE] {str(e)}")
         return None
 
-
-# FUNÇÃO PARA BAIXAR TODOS
-def baixar_todos(uf=None, ano=None, mes=None, upload=True):
+# ============================================================
+# 5. FUNÇÃO PARA BAIXAR TODOS
+# ============================================================
+def baixar_todos(
+    uf: str = None,
+    ano: int = None,
+    mes: int = None,
+    upload: bool = True
+) -> dict:
+    """
+    Baixa todas as fontes de dados de uma vez.
+    """
     if uf is None:
         uf = config.UF
     if ano is None:
@@ -186,7 +250,9 @@ def baixar_todos(uf=None, ano=None, mes=None, upload=True):
     return resultados
 
 
-# MAIN
+# ============================================================
+# 6. MAIN COM ARGPARSE
+# ============================================================
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Ingestão de dados do MedData")
     parser.add_argument('--uf', type=str, default=config.UF, help='UF do estado')

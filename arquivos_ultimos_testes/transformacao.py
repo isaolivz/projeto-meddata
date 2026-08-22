@@ -13,6 +13,8 @@ import argparse
 import sys
 import logging
 from pathlib import Path
+from typing import Dict, Optional
+
 import pandas as pd
 import numpy as np
 
@@ -40,7 +42,12 @@ ESTADOS = {
 }
 
 
-def transformar_sih(df, uf=None, ano=None, mes=None):
+def transformar_sih(
+    df: pd.DataFrame,
+    uf: str = None,
+    ano: int = None,
+    mes: int = None
+) -> pd.DataFrame:
     """Limpa e padroniza os dados brutos do SIH/SUS."""
     uf = uf or config.UF
     ano = ano or config.ANO
@@ -121,7 +128,12 @@ def transformar_sih(df, uf=None, ano=None, mes=None):
     return df_clean
 
 
-def transformar_cnes(df, uf=None, ano=None, mes=None):
+def transformar_cnes(
+    df: pd.DataFrame,
+    uf: str = None,
+    ano: int = None,
+    mes: int = None
+) -> pd.DataFrame:
     """Limpa e padroniza os dados brutos do CNES."""
     uf = uf or config.UF
     ano = ano or config.ANO
@@ -136,6 +148,7 @@ def transformar_cnes(df, uf=None, ano=None, mes=None):
         'CODUFMUN': 'codigo_municipio',
         'TP_LEITO': 'tipo_leito',
         'QT_EXIST': 'leitos_totais',
+        'QT_CONTR': 'leitos_contratados',
         'QT_SUS': 'leitos_sus',
         'QT_NSUS': 'leitos_nao_sus',
         'ESFERA_A': 'esfera',
@@ -148,7 +161,7 @@ def transformar_cnes(df, uf=None, ano=None, mes=None):
     df_clean = df[colunas_existentes].copy()
     df_clean.rename(columns={k: v for k, v in colunas_cnes.items() if k in df.columns}, inplace=True)
 
-    colunas_numericas = ['leitos_totais', 'leitos_sus', 'leitos_nao_sus']
+    colunas_numericas = ['leitos_totais', 'leitos_contratados', 'leitos_sus', 'leitos_nao_sus']
     for col in colunas_numericas:
         if col in df_clean.columns:
             df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce').fillna(0).astype(int)
@@ -168,7 +181,7 @@ def transformar_cnes(df, uf=None, ano=None, mes=None):
 
     df_agrupado = df_clean.groupby(colunas_agrupar)[colunas_somar].sum().reset_index()
 
-    def classificar_porte(total_leitos):
+    def classificar_porte(total_leitos: int) -> str:
         if total_leitos >= 150:
             return 'Grande Porte'
         elif total_leitos >= 50:
@@ -185,6 +198,10 @@ def transformar_cnes(df, uf=None, ano=None, mes=None):
             lambda x: 'Alta Complexidade' if pd.notna(x) and x != '' else 'Baixa/Media Complexidade'
         )
 
+    mapeamento_esfera = {'E': 'Estadual', 'M': 'Municipal', 'F': 'Federal'}
+    if 'esfera' in df_agrupado.columns:
+        df_agrupado['esfera_classificacao'] = df_agrupado['esfera'].map(mapeamento_esfera).fillna('Nao Informado')
+
     if 'leitos_totais' in df_agrupado.columns and 'leitos_sus' in df_agrupado.columns:
         df_agrupado['percentual_sus'] = (
             df_agrupado['leitos_sus'] / df_agrupado['leitos_totais'] * 100
@@ -196,18 +213,25 @@ def transformar_cnes(df, uf=None, ano=None, mes=None):
     return df_agrupado
 
 
-def transformar_ibge(df, uf=None):
+def transformar_ibge(
+    df: pd.DataFrame,
+    uf: str = None
+) -> pd.DataFrame:
     """Limpa e padroniza os dados do IBGE, adicionando UF e estado."""
     uf = uf or config.UF
 
     logger.info(f"Transformando IBGE: {len(df):,} municipios para {uf}")
 
+    # Selecionar apenas as colunas disponíveis no arquivo
     colunas_ibge = ['codigo_ibge', 'nome', 'uf', 'latitude', 'longitude']
+    
+    # Verificar quais colunas realmente existem
     colunas_existentes = [col for col in colunas_ibge if col in df.columns]
     logger.info(f"Colunas encontradas: {colunas_existentes}")
 
     df_clean = df[colunas_existentes].copy()
 
+    # Padronizar nomes das colunas
     df_clean.rename(columns={
         'codigo_ibge': 'codigo_municipio',
         'nome': 'nome_municipio',
@@ -216,7 +240,20 @@ def transformar_ibge(df, uf=None):
         'longitude': 'longitude'
     }, inplace=True)
 
+    # Mapeamento de UF para nome do estado
+    ESTADOS = {
+        'AC': 'Acre', 'AL': 'Alagoas', 'AP': 'Amapa', 'AM': 'Amazonas',
+        'BA': 'Bahia', 'CE': 'Ceara', 'DF': 'Distrito Federal', 'ES': 'Espirito Santo',
+        'GO': 'Goias', 'MA': 'Maranhao', 'MT': 'Mato Grosso', 'MS': 'Mato Grosso do Sul',
+        'MG': 'Minas Gerais', 'PA': 'Para', 'PB': 'Paraiba', 'PR': 'Parana',
+        'PE': 'Pernambuco', 'PI': 'Piaui', 'RJ': 'Rio de Janeiro', 'RN': 'Rio Grande do Norte',
+        'RS': 'Rio Grande do Sul', 'RO': 'Rondonia', 'RR': 'Roraima', 'SC': 'Santa Catarina',
+        'SP': 'Sao Paulo', 'SE': 'Sergipe', 'TO': 'Tocantins'
+    }
+
     df_clean['estado'] = df_clean['uf'].map(ESTADOS).fillna('Nao informado')
+    
+    # Tratar nulos
     df_clean['nome_municipio'] = df_clean['nome_municipio'].fillna('Nao informado')
     df_clean['latitude'] = df_clean['latitude'].fillna(0)
     df_clean['longitude'] = df_clean['longitude'].fillna(0)
@@ -225,8 +262,15 @@ def transformar_ibge(df, uf=None):
     logger.info(f"IBGE transformado: {len(df_clean):,} municipios")
     return df_clean
 
-
-def salvar_resultados_transformacao(df_sih, df_cnes, df_ibge, uf=None, ano=None, mes=None, upload=True):
+def salvar_resultados_transformacao(
+    df_sih: pd.DataFrame,
+    df_cnes: pd.DataFrame,
+    df_ibge: pd.DataFrame,
+    uf: str = None,
+    ano: int = None,
+    mes: int = None,
+    upload: bool = True
+) -> Dict[str, Path]:
     """Salva DataFrames transformados localmente e no Object Storage."""
     uf = uf or config.UF
     ano = ano or config.ANO
@@ -234,6 +278,7 @@ def salvar_resultados_transformacao(df_sih, df_cnes, df_ibge, uf=None, ano=None,
 
     resultados = {}
 
+    # SIH
     if df_sih is not None and len(df_sih) > 0:
         caminho = config.PROCESSED_DIR / f"sih_transformado_{uf}_{ano}_{mes:02d}.parquet"
         df_sih.to_parquet(caminho, index=False)
@@ -244,6 +289,7 @@ def salvar_resultados_transformacao(df_sih, df_cnes, df_ibge, uf=None, ano=None,
             objeto = f"sih_transformado/{uf}/{ano}/{mes:02d}/sih_transformado_{uf}_{ano}_{mes:02d}.parquet"
             _upload_para_object_storage(caminho, objeto, "meddata-gold")
 
+    # CNES
     if df_cnes is not None and len(df_cnes) > 0:
         caminho = config.PROCESSED_DIR / f"cnes_transformado_{uf}_{ano}_{mes:02d}.parquet"
         df_cnes.to_parquet(caminho, index=False)
@@ -254,6 +300,7 @@ def salvar_resultados_transformacao(df_sih, df_cnes, df_ibge, uf=None, ano=None,
             objeto = f"cnes_transformado/{uf}/{ano}/{mes:02d}/cnes_transformado_{uf}_{ano}_{mes:02d}.parquet"
             _upload_para_object_storage(caminho, objeto, "meddata-gold")
 
+    # IBGE
     if df_ibge is not None and len(df_ibge) > 0:
         caminho = config.PROCESSED_DIR / f"ibge_transformado_{uf}.parquet"
         df_ibge.to_parquet(caminho, index=False)
@@ -267,7 +314,7 @@ def salvar_resultados_transformacao(df_sih, df_cnes, df_ibge, uf=None, ano=None,
     return resultados
 
 
-def _upload_para_object_storage(arquivo_local, objeto_name, bucket="meddata-gold"):
+def _upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: str = "meddata-gold") -> bool:
     """Faz upload de um arquivo para o Object Storage da OCI."""
     try:
         import oci
@@ -287,7 +334,15 @@ def _upload_para_object_storage(arquivo_local, objeto_name, bucket="meddata-gold
         return False
 
 
-def executar_transformacao(df_sih_raw, df_cnes_raw, df_ibge_raw, uf=None, ano=None, mes=None, upload=True):
+def executar_transformacao(
+    df_sih_raw: pd.DataFrame,
+    df_cnes_raw: pd.DataFrame,
+    df_ibge_raw: pd.DataFrame,
+    uf: str = None,
+    ano: int = None,
+    mes: int = None,
+    upload: bool = True
+) -> Dict[str, pd.DataFrame]:
     """Executa o pipeline de transformacao das tres fontes de dados."""
     uf = uf or config.UF
     ano = ano or config.ANO
