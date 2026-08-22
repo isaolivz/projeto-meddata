@@ -22,7 +22,7 @@ class Config:
     """
     
     # Parâmetros principais
-    UF: str = "PR"
+    UF: str = "SP"
     ANO: int = 2024
     MES: int = 1
     
