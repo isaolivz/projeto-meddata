@@ -1,0 +1,33 @@
+Coluna,Tipo,Nulos,% Nulos,Valores Únicos,Exemplo
+internacao_id,int64,0,0.0,1524916,1
+id_hospital,object,0,0.0,616,2087219
+codigo_municipio_paciente,object,0,0.0,1321,350960
+tempo_id,int64,0,0.0,1213,1
+codigo_diagnostico,object,0,0.0,5513,K590
+data_internacao,datetime64[ns],0,0.0,1213,2024-01-28 00:00:00
+data_saida,datetime64[ns],0,0.0,184,2024-01-30 00:00:00
+valor_procedimento,float64,0,0.0,30350,0.0
+dias_internacao,int64,0,0.0,1212,2
+paciente_viajou,bool,0,0.0,2,False
+nome_municipio_paciente,object,0,0.0,646,Campo Limpo Paulista
+uf_paciente,object,0,0.0,2,SP
+estado_paciente,object,0,0.0,2,Sao Paulo
+latitude_paciente,float64,0,0.0,641,-23.2078
+longitude_paciente,float64,0,0.0,640,-46.7889
+nome_municipio_hospital_x,object,0,0.0,324,Campo Limpo Paulista
+latitude_hospital,float64,0,0.0,324,-23.2078
+longitude_hospital,float64,0,0.0,322,-46.7889
+distancia_estimada_km,float64,0,0.0,4414,0.0
+ano_competencia,int64,0,0.0,1,2024
+mes_competencia,int64,0,0.0,1,1
+dia_semana,object,0,0.0,7,Sunday
+tipo_dia,object,0,0.0,2,Fim de Semana
+nome_municipio_hospital_y,object,0,0.0,324,Campo Limpo Paulista
+leitos_totais,int64,0,0.0,248,66
+porte_hospitalar,object,0,0.0,4,Medio Porte
+alta_complexidade,object,0,0.0,1,Baixa/Media Complexidade
+uf_hospital,object,0,0.0,1,SP
+codigo_municipio,object,14740,0.9666106198636516,645,350960
+nome_municipio,object,14740,0.9666106198636516,645,Campo Limpo Paulista
+uf,object,14740,0.9666106198636516,1,SP
+estado,object,14740,0.9666106198636516,1,Sao Paulo
