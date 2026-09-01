@@ -5,3 +5,8 @@ matplotlib
 seaborn
 oci
 oracledb
+oracledb>=2.0.0
+flask>=2.0.0
+flask-cors>=4.0.0
+cohere>=4.0.0
+chromadb>=0.4.0
