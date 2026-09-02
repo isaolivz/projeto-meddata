@@ -21,9 +21,9 @@ class DatabaseConnection:
                 password=Config.ORACLE_PASSWORD,
                 dsn=Config.ORACLE_DSN
             )
-            print("✅ Conectado ao Oracle!")
+            print("Conectado ao Oracle!")
         except Exception as e:
-            print(f"❌ Erro: {e}")
+            print(f"Erro: {e}")
             raise
     
     def get_connection(self):
