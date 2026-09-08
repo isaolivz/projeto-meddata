@@ -269,12 +269,13 @@ def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_cid1
     fato.drop(columns=['data_referencia'], inplace=True, errors='ignore')
 
     # --- NOVO: Adicionar CID10 ---
+    # Em integracao_v2.py - gerar_fato_internacao()
     if df_cid10 is not None and len(df_cid10) > 0:
-        # Usar a categoria (3 dígitos) para fazer o join
+    # Usar a categoria de 4 dígitos para fazer o join
         fato = fato.merge(
             df_cid10[['categoria_cid', 'cid10_id', 'codigo_cid', 'descricao_cid']],
-            left_on='categoria_cid',
-            right_on='categoria_cid',
+            left_on='categoria_cid',  # 4 dígitos: 'A000'
+            right_on='categoria_cid',  # 4 dígitos: 'A000'
             how='left'
         )
         logger.info(f"Apos merge com CID10: {len(fato):,} registros")
