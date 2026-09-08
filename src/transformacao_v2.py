@@ -2,7 +2,7 @@
 transformacao_v2.py - Transformacao de dados do MedData (versão anual com limite)
 - Suporte para múltiplos meses
 - Limite de 300k registros por mês
-- Integração com CID-10 (categoria de 3 dígitos)
+- Integração com CID-10 (SUBCAT com 4 dígitos)
 - Criação de nome fictício para hospitais
 - Remoção da coluna 'esfera'
 """
@@ -37,7 +37,7 @@ ESTADOS = {
 
 
 # ============================================================================
-# 1. Transformar SIH (com CID-10)
+# 1. Transformar SIH (com CID-10 de 4 dígitos)
 # ============================================================================
 
 def transformar_sih(df, uf=None, ano=None, mes=None):
@@ -48,7 +48,6 @@ def transformar_sih(df, uf=None, ano=None, mes=None):
 
     logger.info(f"Transformando SIH: {len(df):,} registros para {uf} {ano}/{mes:02d}")
 
-    # Colunas essenciais para o SIH (grupo RD)
     colunas_essenciais = [
         'SP_GESTOR', 'SP_CNES', 'SP_CIDPRI', 'SP_DTINTER',
         'SP_DTSAIDA', 'SP_VALATO', 'SP_M_PAC', 'SP_AA', 'SP_MM'
@@ -92,12 +91,11 @@ def transformar_sih(df, uf=None, ano=None, mes=None):
     mapeamento_existente = {k: v for k, v in mapeamento.items() if k in df_clean.columns}
     df_clean.rename(columns=mapeamento_existente, inplace=True)
 
-    # --- NOVO: Processamento do CID-10 ---
-    # Extrair categoria (3 primeiros dígitos sem ponto)
+    # Processamento do CID-10 (4 dígitos sem ponto)
     if 'codigo_diagnostico' in df_clean.columns:
-    # SIH já vem com 4 dígitos sem ponto: 'A000'
+        # SIH já vem com 4 dígitos: 'A000'
         df_clean['categoria_cid'] = df_clean['codigo_diagnostico'].astype(str).str[:4]
-        logger.info(f"CID-10: {df_clean['categoria_cid'].nunique()} categorias únicas extraídas")
+        logger.info(f"CID-10: {df_clean['categoria_cid'].nunique()} categorias únicas extraídas (4 dígitos)")
 
     # Features derivadas
     if 'data_internacao' in df_clean.columns and 'data_saida' in df_clean.columns:
@@ -151,7 +149,6 @@ def transformar_cnes(df, uf=None, ano=None, mes=None):
         'QT_EXIST': 'leitos_totais',
         'QT_SUS': 'leitos_sus',
         'QT_NSUS': 'leitos_nao_sus',
-        # 'ESFERA_A': 'esfera',  # REMOVIDO - coluna nula
         'TP_UNID': 'tipo_unidade',
         'NIV_HIER': 'nivel_hierarquico',
         'NAT_JUR': 'natureza_juridica'
@@ -171,13 +168,13 @@ def transformar_cnes(df, uf=None, ano=None, mes=None):
     if 'codigo_municipio' in df_clean.columns:
         df_clean['codigo_municipio'] = df_clean['codigo_municipio'].astype(str).str.zfill(6)
 
-    # --- NOVO: Criar nome fictício para o hospital ---
+    # Criar nome fictício para o hospital
     if 'id_hospital' in df_clean.columns:
         df_clean['nome_hospital'] = 'Hospital CNES ' + df_clean['id_hospital']
 
     # Agrupar por hospital (SEM 'esfera')
     colunas_agrupar = [
-        'id_hospital', 'codigo_municipio',  # 'esfera' removido
+        'id_hospital', 'codigo_municipio',
         'tipo_unidade', 'nivel_hierarquico', 'natureza_juridica'
     ]
     colunas_agrupar = [col for col in colunas_agrupar if col in df_clean.columns]
@@ -188,7 +185,6 @@ def transformar_cnes(df, uf=None, ano=None, mes=None):
 
     # Manter o nome do hospital após o groupby
     if 'nome_hospital' in df_clean.columns and 'id_hospital' in df_agrupado.columns:
-        # Pegar o primeiro nome para cada hospital (todos são iguais)
         nomes_hospitais = df_clean[['id_hospital', 'nome_hospital']].drop_duplicates(subset=['id_hospital'])
         df_agrupado = df_agrupado.merge(nomes_hospitais, on='id_hospital', how='left')
 
@@ -232,7 +228,6 @@ def transformar_ibge(df, uf=None):
 
     colunas_ibge = ['codigo_ibge', 'nome', 'uf', 'latitude', 'longitude']
     colunas_existentes = [col for col in colunas_ibge if col in df.columns]
-    logger.info(f"Colunas encontradas: {colunas_existentes}")
 
     df_clean = df[colunas_existentes].copy()
 
@@ -268,14 +263,29 @@ def transformar_cid10(df_cid10):
     
     df_clean = df_cid10.copy()
     
-    # Garantir que temos a categoria (4 dígitos sem ponto)
-    if 'categoria' not in df_clean.columns:
-        if 'codigo_cid' in df_clean.columns:
-            # Remover ponto e pegar 4 dígitos: 'A00.0' -> 'A000'
-            df_clean['categoria'] = df_clean['codigo_cid'].astype(str).str.replace('.', '').str[:4]
+    # Mapear colunas SUBCAT e DESCRICAO
+    if 'SUBCAT' in df_clean.columns and 'DESCRICAO' in df_clean.columns:
+        df_clean.rename(columns={
+            'SUBCAT': 'subcat',
+            'DESCRICAO': 'descricao_cid'
+        }, inplace=True)
+        logger.info("Colunas SUBCAT e DESCRICAO mapeadas")
+    
+    # Garantir que temos subcat
+    if 'subcat' not in df_clean.columns:
+        logger.warning("Coluna 'subcat' não encontrada")
+        return None
+    
+    # Criar categoria (4 dígitos) - JÁ VEM SEM PONTO!
+    df_clean['categoria_cid'] = df_clean['subcat'].astype(str).str[:4]
+    logger.info(f"Categorias extraídas: {df_clean['categoria_cid'].nunique()} únicas")
     
     # Remover duplicatas por categoria
-    df_clean = df_clean.drop_duplicates(subset=['categoria'])
+    df_clean = df_clean.drop_duplicates(subset=['categoria_cid'])
+    
+    # Garantir que temos descrição
+    if 'descricao_cid' not in df_clean.columns:
+        df_clean['descricao_cid'] = 'Nao informado'
     
     logger.info(f"CID-10 transformado: {len(df_clean):,} categorias únicas")
     return df_clean
@@ -294,7 +304,6 @@ def salvar_resultados_transformacao(df_sih, df_cnes, df_ibge, df_cid10=None,
 
     resultados = {}
 
-    # SIH - salvar como anual se mes=0
     if df_sih is not None and len(df_sih) > 0:
         if mes == 0:
             caminho = config.PROCESSED_DIR / f"sih_transformado_{uf}_{ano}_anual.parquet"
@@ -304,7 +313,6 @@ def salvar_resultados_transformacao(df_sih, df_cnes, df_ibge, df_cid10=None,
         resultados['sih'] = caminho
         logger.info(f"SIH salvo: {caminho} ({len(df_sih):,} registros)")
 
-    # CNES - salvar como anual se mes=0
     if df_cnes is not None and len(df_cnes) > 0:
         if mes == 0:
             caminho = config.PROCESSED_DIR / f"cnes_transformado_{uf}_{ano}_anual.parquet"
@@ -314,14 +322,12 @@ def salvar_resultados_transformacao(df_sih, df_cnes, df_ibge, df_cid10=None,
         resultados['cnes'] = caminho
         logger.info(f"CNES salvo: {caminho} ({len(df_cnes):,} registros)")
 
-    # IBGE
     if df_ibge is not None and len(df_ibge) > 0:
         caminho = config.REFERENCE_DIR / f"ibge_transformado_{uf}.parquet"
         df_ibge.to_parquet(caminho, index=False)
         resultados['ibge'] = caminho
         logger.info(f"IBGE salvo: {caminho} ({len(df_ibge):,} registros)")
 
-    # CID-10
     if df_cid10 is not None and len(df_cid10) > 0:
         caminho = config.REFERENCE_DIR / f"dim_cid10.parquet"
         df_cid10.to_parquet(caminho, index=False)
@@ -350,34 +356,27 @@ def transformar_multiplos_meses(uf=None, ano=None, meses=None, limite_por_mes=30
     print(f"Limite por mês: {limite_por_mes:,} registros")
     print("=" * 60)
 
-    # Importar da ingestão v2
     from ingestao_v2 import baixar_multiplos_meses
     
-    # Baixar dados de múltiplos meses
     dados_brutos = baixar_multiplos_meses(uf, ano, meses, limite_por_mes, upload)
     
     if dados_brutos['sih'] is None:
         print("Erro: Não foi possível baixar os dados SIH")
         return None
 
-    # Transformar SIH
     print("\nTransformando SIH...")
-    df_sih = transformar_sih(dados_brutos['sih'], uf, ano, mes=0)  # mes=0 = anual
+    df_sih = transformar_sih(dados_brutos['sih'], uf, ano, mes=0)
 
-    # Transformar CNES
     print("\nTransformando CNES...")
     df_cnes = transformar_cnes(dados_brutos['cnes'], uf, ano, mes=0)
 
-    # Transformar IBGE (só precisa uma vez)
     from ingestao_v2 import baixar_ibge
     df_ibge_raw = baixar_ibge(uf, upload=False)
     df_ibge = transformar_ibge(df_ibge_raw, uf)
 
-    # Transformar CID-10
     print("\nTransformando CID-10...")
     df_cid10 = transformar_cid10(dados_brutos['cid10'])
 
-    # Salvar resultados
     print("\nSalvando dados transformados...")
     salvar_resultados_transformacao(
         df_sih, df_cnes, df_ibge, df_cid10,
@@ -448,12 +447,9 @@ if __name__ == "__main__":
     config.UF = args.uf
     config.ANO = args.ano
 
-    # Se especificou meses ou limite, transforma múltiplos meses
-    if args.meses or args.limite != 300000:
-        meses = args.meses if args.meses else list(range(1, 13))
-        transformar_multiplos_meses(args.uf, args.ano, meses, args.limite, args.upload)
+    if args.meses:
+        transformar_multiplos_meses(args.uf, args.ano, args.meses, args.limite, args.upload)
     elif args.mes:
-        # Modo único mês (compatibilidade)
         config.MES = args.mes
         
         from ingestao_v2 import baixar_sih, baixar_cnes_leitos, baixar_ibge, baixar_cid10
@@ -478,7 +474,6 @@ if __name__ == "__main__":
             upload=args.upload
         )
     else:
-        # Modo automático: transforma todos os meses
         print("Modo automático: transformando todos os meses de 2024")
         transformar_multiplos_meses(args.uf, args.ano, list(range(1, 13)), args.limite, args.upload)
 

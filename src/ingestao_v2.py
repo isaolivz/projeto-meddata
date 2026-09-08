@@ -1,8 +1,8 @@
 """
 ingestao_v2.py - Ingestão de dados do MedData (versão anual com limite)
-- Baixa 12 meses de 2024 com limite de 300k registros por mês
+- Baixa 12 meses com limite de 300k registros por mês
 - Baixa dados SIH do grupo RD
-- Lê CSV de diagnóstico CID-10
+- Lê CSV de diagnóstico CID-10 (colunas SUBCAT e DESCRICAO)
 - Mantém compatibilidade com o original
 """
 
@@ -48,56 +48,57 @@ def upload_para_object_storage(arquivo_local: Path, objeto_name: str, bucket: st
 def baixar_cid10(caminho_csv=None):
     """
     Lê o arquivo CSV de diagnóstico CID-10.
-    Mantém apenas categoria (3 dígitos) e descrição.
+    Colunas esperadas: SUBCAT e DESCRICAO
     """
     if caminho_csv is None:
-        caminho_csv = config.DATA_DIR / "reference" / "CID-10-SUBCATEGORIAS.CSV"
+        caminho_csv = config.DATA_DIR / "reference" / "cid10.csv"
     
-    print(f"[CID-10] Carregando arquivo: {caminho_csv}")
+    print(f"[CID-10] Procurando arquivo em: {caminho_csv}")
+    
+    if not caminho_csv.exists():
+        print(f"[CID-10] ERRO: Arquivo não encontrado em {caminho_csv}")
+        print(f"[CID-10] Por favor, coloque o arquivo cid10.csv na pasta: {config.DATA_DIR / 'reference'}")
+        return None
     
     try:
-        # Ler CSV (ajuste o separador conforme seu arquivo)
-        df = pd.read_csv(caminho_csv, sep=';', encoding='latin1')
-        print(f"[CID-10] Arquivo carregado: {len(df):,} registros")
+        # Tentar diferentes separadores
+        df = None
+        for sep in [';', ',', '\t']:
+            try:
+                df = pd.read_csv(caminho_csv, sep=sep, encoding='latin1')
+                print(f"[CID-10] Arquivo carregado com separador '{sep}': {len(df):,} registros")
+                break
+            except:
+                continue
         
-        # Identificar colunas
-        colunas = df.columns.tolist()
-        print(f"[CID-10] Colunas disponíveis: {colunas}")
+        if df is None:
+            print("[CID-10] ERRO: Não foi possível ler o arquivo com nenhum separador")
+            return None
         
-        # Mapear colunas (ajuste conforme seu CSV)
-        # Exemplo: se tiver 'CODIGO' e 'DESCRICAO'
-        col_codigo = None
-        col_descricao = None
+        print(f"[CID-10] Colunas disponíveis: {df.columns.tolist()}")
         
-        for col in colunas:
-            if 'COD' in col.upper() or 'CID' in col.upper():
-                col_codigo = col
-            if 'DESC' in col.upper() or 'NOME' in col.upper() or 'DESCRI' in col.upper():
-                col_descricao = col
-        
-        if col_codigo is None or col_descricao is None:
-            print("[CID-10] ERRO: Não foi possível identificar colunas de código e descrição")
+        # Verificar se tem SUBCAT e DESCRICAO
+        if 'SUBCAT' not in df.columns or 'DESCRICAO' not in df.columns:
+            print(f"[CID-10] ERRO: Colunas esperadas 'SUBCAT' e 'DESCRICAO' não encontradas")
+            print(f"[CID-10] Colunas disponíveis: {df.columns.tolist()}")
             return None
         
         # Manter apenas as colunas necessárias
-        df_clean = df[[col_codigo, col_descricao]].copy()
+        df_clean = df[['SUBCAT', 'DESCRICAO']].copy()
         df_clean.rename(columns={
-            col_codigo: 'codigo_cid',
-            col_descricao: 'descricao_cid'
+            'SUBCAT': 'subcat',
+            'DESCRICAO': 'descricao_cid'
         }, inplace=True)
         
-        # Extrair categoria (3 primeiros dígitos, sem ponto)
-        df_clean['categoria'] = df_clean['codigo_cid'].astype(str).str.replace('.', '').str[:3]
+        # Remover duplicatas
+        df_clean = df_clean.drop_duplicates(subset=['subcat'])
         
-        # Remover duplicatas por categoria
-        df_clean = df_clean.drop_duplicates(subset=['categoria'])
+        print(f"[CID-10] Processado: {len(df_clean):,} registros únicos")
         
-        print(f"[CID-10] Processado: {len(df_clean):,} categorias únicas")
-        
-        # Salvar na pasta reference
-        caminho_salvo = config.REFERENCE_DIR / "dim_cid10.parquet"
-        df_clean.to_parquet(caminho_salvo, index=False)
-        print(f"[CID-10] Salvo em: {caminho_salvo}")
+        # Salvar na pasta reference como parquet
+        caminho_parquet = config.REFERENCE_DIR / "dim_cid10.parquet"
+        df_clean.to_parquet(caminho_parquet, index=False)
+        print(f"[CID-10] Salvo em: {caminho_parquet}")
         
         return df_clean
         
@@ -296,7 +297,6 @@ def baixar_multiplos_meses(uf=None, ano=None, meses=None, limite_por_mes=300000,
     
     if df_sih_combinado is not None:
         print(f"Total SIH: {len(df_sih_combinado):,} registros")
-        # Salvar arquivo combinado
         caminho_combinado = config.RAW_DIR / f"sih_{uf}_{ano}_todos_meses.parquet"
         df_sih_combinado.to_parquet(caminho_combinado, index=False)
         print(f"SIH combinado salvo em: {caminho_combinado}")
@@ -309,7 +309,6 @@ def baixar_multiplos_meses(uf=None, ano=None, meses=None, limite_por_mes=300000,
     
     print("=" * 60)
     
-    # Retornar também o CID-10
     return {
         'sih': df_sih_combinado,
         'cnes': df_cnes_combinado,
@@ -339,7 +338,7 @@ def baixar_todos(uf=None, ano=None, mes=None, upload=True):
     resultados['sih'] = baixar_sih(uf, ano, mes, upload)
     resultados['cnes'] = baixar_cnes_leitos(uf, ano, mes, upload)
     resultados['ibge'] = baixar_ibge(uf, upload)
-    resultados['cid10'] = baixar_cid10()  # Novo
+    resultados['cid10'] = baixar_cid10()
     
     print("=" * 50)
     print("RESUMO DA INGESTÃO")
@@ -368,13 +367,12 @@ if __name__ == "__main__":
     parser.add_argument('--no-upload', action='store_false', dest='upload', help='Não fazer upload para OCI')
     args = parser.parse_args()
     
-    # Se especificou meses ou limite, baixa múltiplos meses
-    if args.meses or args.limite != 300000:
-        meses = args.meses if args.meses else list(range(1, 13))
+    # Se especificou meses, baixa múltiplos meses
+    if args.meses:
         dados = baixar_multiplos_meses(
             uf=args.uf,
             ano=args.ano,
-            meses=meses,
+            meses=args.meses,
             limite_por_mes=args.limite,
             upload=args.upload
         )
@@ -400,4 +398,4 @@ if __name__ == "__main__":
         sys.exit(0)
     else:
         print("\nATENÇÃO: Algumas fontes falharam.")
-        sys.exit(1) 
+        sys.exit(1)

@@ -2,7 +2,7 @@
 integracao_v2.py - Integracao e geracao do Star Schema (versão anual)
 - Suporte para múltiplos meses
 - Limite de 300k registros por mês
-- DIM_CID10 (categoria de 3 dígitos)
+- DIM_DIAGNOSTICO (com SUBCAT e DESCRICAO do CSV)
 - Remoção da coluna 'esfera'
 - Nome fictício para hospitais
 """
@@ -88,7 +88,6 @@ def gerar_dim_hospital(df_cnes, df_municipios):
 
     dim = df_cnes.copy()
 
-    # Garantir que temos o nome do hospital (criado na transformação)
     if 'nome_hospital' not in dim.columns:
         dim['nome_hospital'] = 'Hospital CNES ' + dim['id_hospital'].astype(str)
 
@@ -112,10 +111,9 @@ def gerar_dim_hospital(df_cnes, df_municipios):
 
     dim = dim.drop_duplicates(subset=['id_hospital'])
 
-    # Colunas da dimensão hospital (SEM esfera)
     colunas_ordem = [
         'id_hospital',
-        'nome_hospital',          # NOVO: nome fictício
+        'nome_hospital',
         'codigo_municipio',
         'nome_municipio_hospital',
         'uf_hospital',
@@ -125,7 +123,6 @@ def gerar_dim_hospital(df_cnes, df_municipios):
         'leitos_totais',
         'leitos_sus',
         'leitos_nao_sus',
-        # 'esfera',               # REMOVIDO
         'tipo_unidade',
         'nivel_hierarquico',
         'natureza_juridica',
@@ -146,10 +143,7 @@ def gerar_dim_hospital(df_cnes, df_municipios):
 # ============================================================================
 
 def gerar_dim_tempo(df_sih):
-    """
-    Gera a dimensao de tempo a partir das datas do SIH.
-    Mantem TODAS as datas disponiveis.
-    """
+    """Gera a dimensao de tempo a partir das datas do SIH."""
     logger.info("Gerando DIM_TEMPO...")
 
     if 'data_internacao' not in df_sih.columns:
@@ -181,67 +175,87 @@ def gerar_dim_tempo(df_sih):
 
 
 # ============================================================================
-# 4. DIM_CID10 (NOVO)
+# 4. DIM_DIAGNOSTICO (com SUBCAT e DESCRICAO do CSV)
 # ============================================================================
 
-def gerar_dim_cid10(df_cid10):
-    """Gera a dimensao de CID-10 a partir do arquivo processado."""
-    logger.info("Gerando DIM_CID10...")
+def gerar_dim_diagnostico(df_cid10):
+    """
+    Gera a dimensão de diagnóstico a partir do CID-10.
+    Usa as colunas SUBCAT e DESCRICAO do CSV.
+    """
+    logger.info("Gerando DIM_DIAGNOSTICO...")
 
     if df_cid10 is None or len(df_cid10) == 0:
-        logger.warning("Nenhum dado CID-10 disponível")
-        return pd.DataFrame()
+        logger.warning("Nenhum dado CID-10 disponível. Criando dimensão vazia.")
+        return pd.DataFrame(columns=[
+            'diagnostico_id',
+            'subcat',
+            'categoria_cid',
+            'descricao_cid'
+        ])
 
     dim = df_cid10.copy()
-    
-    # Garantir colunas necessárias
-    if 'categoria' not in dim.columns:
-        if 'codigo_cid' in dim.columns:
-            dim['categoria'] = dim['codigo_cid'].astype(str).str.replace('.', '').str[:3]
-    
-    # Remover duplicatas
-    dim = dim.drop_duplicates(subset=['categoria'])
-    
-    # Adicionar ID
-    dim['cid10_id'] = range(1, len(dim) + 1)
-    
-    # Selecionar colunas
-    colunas_ordem = ['cid10_id', 'categoria', 'codigo_cid', 'descricao_cid']
-    colunas_existentes = [col for col in colunas_ordem if col in dim.columns]
-    dim = dim[colunas_existentes]
-    
-    # Renomear para padrão
-    if 'categoria' in dim.columns:
-        dim.rename(columns={'categoria': 'categoria_cid'}, inplace=True)
-    
-    logger.info(f"DIM_CID10 gerada: {len(dim):,} categorias")
+    logger.info(f"Colunas disponíveis no CID-10: {dim.columns.tolist()}")
+
+    if 'subcat' not in dim.columns:
+        logger.error("Coluna 'subcat' não encontrada no CID-10")
+        return pd.DataFrame(columns=[
+            'diagnostico_id',
+            'subcat',
+            'categoria_cid',
+            'descricao_cid'
+        ])
+
+    if 'descricao_cid' not in dim.columns:
+        dim['descricao_cid'] = 'Nao informado'
+
+    if 'categoria_cid' not in dim.columns:
+        dim['categoria_cid'] = dim['subcat'].astype(str).str[:4]
+        logger.info(f"Categoria extraída da subcat: {dim['categoria_cid'].nunique()} categorias únicas")
+
+    dim = dim.drop_duplicates(subset=['categoria_cid'])
+    dim = dim.sort_values('categoria_cid').reset_index(drop=True)
+    dim['diagnostico_id'] = range(1, len(dim) + 1)
+
+    colunas_ordem = [
+        'diagnostico_id',
+        'subcat',
+        'categoria_cid',
+        'descricao_cid'
+    ]
+
+    for col in colunas_ordem:
+        if col not in dim.columns:
+            if col == 'diagnostico_id':
+                continue
+            dim[col] = 'Nao informado'
+
+    dim = dim[colunas_ordem]
+
+    logger.info(f"DIM_DIAGNOSTICO gerada: {len(dim):,} diagnósticos")
     return dim
 
 
 # ============================================================================
-# 5. FATO_INTERNACAO (com FK para CID10)
+# 5. FATO_INTERNACAO (com FK para DIM_DIAGNOSTICO)
 # ============================================================================
 
-def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_cid10=None):
-    """
-    Gera a tabela fato de internacoes com FK para CID10.
-    """
+def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_diagnostico=None):
+    """Gera a tabela fato de internacoes com FK para DIM_DIAGNOSTICO."""
     logger.info("Gerando FATO_INTERNACAO...")
 
     fato = df_sih.copy()
     logger.info(f"Base SIH: {len(fato):,} registros")
 
-    # Adicionar informacoes do hospital
     fato = fato.merge(
         df_hospitais[['id_hospital', 'codigo_municipio', 'nome_hospital',
-                      'nome_municipio_hospital', 'latitude_hospital', 
+                      'nome_municipio_hospital', 'latitude_hospital',
                       'longitude_hospital', 'leitos_sus']],
         on='id_hospital',
         how='left'
     )
     logger.info(f"Apos merge com hospitais: {len(fato):,} registros")
 
-    # Adicionar informacoes do municipio do paciente
     fato = fato.merge(
         df_municipios[['codigo_municipio', 'nome_municipio', 'uf', 'estado', 'latitude', 'longitude']],
         left_on='codigo_municipio_paciente',
@@ -259,7 +273,6 @@ def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_cid1
     if 'codigo_municipio_paciente_ibge' in fato.columns:
         fato.drop(columns=['codigo_municipio_paciente_ibge'], inplace=True)
 
-    # Adicionar tempo_id
     fato = fato.merge(
         df_tempo[['data_referencia', 'tempo_id']],
         left_on='data_internacao',
@@ -268,21 +281,17 @@ def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_cid1
     )
     fato.drop(columns=['data_referencia'], inplace=True, errors='ignore')
 
-    # --- NOVO: Adicionar CID10 ---
-    # Em integracao_v2.py - gerar_fato_internacao()
-    if df_cid10 is not None and len(df_cid10) > 0:
-    # Usar a categoria de 4 dígitos para fazer o join
+    if df_diagnostico is not None and len(df_diagnostico) > 0:
         fato = fato.merge(
-            df_cid10[['categoria_cid', 'cid10_id', 'codigo_cid', 'descricao_cid']],
-            left_on='categoria_cid',  # 4 dígitos: 'A000'
-            right_on='categoria_cid',  # 4 dígitos: 'A000'
+            df_diagnostico[['categoria_cid', 'diagnostico_id', 'subcat', 'descricao_cid']],
+            left_on='categoria_cid',
+            right_on='categoria_cid',
             how='left'
         )
-        logger.info(f"Apos merge com CID10: {len(fato):,} registros")
+        logger.info(f"Apos merge com diagnostico: {len(fato):,} registros")
 
     logger.info(f"Apos merges: {len(fato):,} registros")
 
-    # Calcular distancia (haversine)
     def haversine(lat1, lon1, lat2, lon2):
         from math import radians, sin, cos, sqrt, atan2
         if pd.isna(lat1) or pd.isna(lon1) or pd.isna(lat2) or pd.isna(lon2):
@@ -305,7 +314,6 @@ def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_cid1
         axis=1
     )
 
-    # Tratar nulos
     fato['nome_municipio_paciente'] = fato['nome_municipio_paciente'].fillna('Nao informado')
     fato['uf_paciente'] = fato['uf_paciente'].fillna('NA')
     fato['estado_paciente'] = fato['estado_paciente'].fillna('Nao informado')
@@ -318,10 +326,15 @@ def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_cid1
     fato['longitude_hospital'] = fato['longitude_hospital'].fillna(0)
 
     fato['codigo_diagnostico'] = fato['codigo_diagnostico'].fillna('Nao informado')
-    
-    # Se tiver CID10, preencher nulos
-    if 'cid10_id' in fato.columns:
-        fato['cid10_id'] = fato['cid10_id'].fillna(0).astype(int)
+
+    if 'diagnostico_id' in fato.columns:
+        fato['diagnostico_id'] = fato['diagnostico_id'].fillna(0).astype(int)
+
+    if 'descricao_cid' in fato.columns:
+        fato['descricao_cid'] = fato['descricao_cid'].fillna('Nao informado')
+
+    if 'subcat' in fato.columns:
+        fato['subcat'] = fato['subcat'].fillna('Nao informado')
 
     fato['internacao_id'] = range(1, len(fato) + 1)
 
@@ -330,11 +343,10 @@ def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_cid1
         'id_hospital',
         'codigo_municipio_paciente',
         'tempo_id',
-        'cid10_id',                    # NOVO: FK para CID10
+        'diagnostico_id',
         'codigo_diagnostico',
-        'categoria_cid',               # NOVO: categoria de 3 dígitos
-        'codigo_cid',                  # NOVO: código completo do CID
-        'descricao_cid',               # NOVO: descrição do diagnóstico
+        'subcat',
+        'descricao_cid',
         'data_internacao',
         'data_saida',
         'valor_procedimento',
@@ -363,12 +375,12 @@ def gerar_fato_internacao(df_sih, df_hospitais, df_municipios, df_tempo, df_cid1
 
 
 # ============================================================================
-# 6. Salvar Star Schema (versão anual)
+# 6. Salvar Star Schema
 # ============================================================================
 
-def salvar_star_schema(dim_municipio, dim_hospital, dim_tempo, dim_cid10, fato_internacao, 
+def salvar_star_schema(dim_municipio, dim_hospital, dim_tempo, dim_diagnostico, fato_internacao,
                        uf=None, ano=None, mes=None, upload=True):
-    """Salva as tabelas do Star Schema (versão anual)."""
+    """Salva as tabelas do Star Schema."""
     uf = uf or config.UF
     ano = ano or config.ANO
     mes = mes or config.MES
@@ -379,28 +391,36 @@ def salvar_star_schema(dim_municipio, dim_hospital, dim_tempo, dim_cid10, fato_i
         'dim_municipio': dim_municipio,
         'dim_hospital': dim_hospital,
         'dim_tempo': dim_tempo,
-        'dim_cid10': dim_cid10,           # NOVO
+        'dim_diagnostico': dim_diagnostico,
         'fato_internacao': fato_internacao
     }
 
     for nome, df in tabelas.items():
-        if df is not None and len(df) > 0:
-            # Nome do arquivo: se mes=0 é anual
-            if mes == 0:
-                caminho = config.PROCESSED_DIR / f"{nome}_{uf}_{ano}_anual.parquet"
-            else:
-                caminho = config.PROCESSED_DIR / f"{nome}_{uf}_{ano}_{mes:02d}.parquet"
-            
-            df.to_parquet(caminho, index=False)
-            resultados[nome] = caminho
-            logger.info(f"{nome.upper()} salvo: {caminho} ({len(df):,} registros)")
+        if df is not None:
+            if len(df) == 0 and nome == 'dim_diagnostico':
+                df = pd.DataFrame(columns=[
+                    'diagnostico_id',
+                    'subcat',
+                    'categoria_cid',
+                    'descricao_cid'
+                ])
 
-            if upload:
+            if len(df) > 0:
                 if mes == 0:
-                    objeto = f"{nome}/{uf}/{ano}/anual/{nome}_{uf}_{ano}_anual.parquet"
+                    caminho = config.PROCESSED_DIR / f"{nome}_{uf}_{ano}_anual.parquet"
                 else:
-                    objeto = f"{nome}/{uf}/{ano}/{mes:02d}/{nome}_{uf}_{ano}_{mes:02d}.parquet"
-                upload_para_object_storage(caminho, objeto, "meddata-gold")
+                    caminho = config.PROCESSED_DIR / f"{nome}_{uf}_{ano}_{mes:02d}.parquet"
+
+                df.to_parquet(caminho, index=False)
+                resultados[nome] = caminho
+                logger.info(f"{nome.upper()} salvo: {caminho} ({len(df):,} registros)")
+
+                if upload:
+                    if mes == 0:
+                        objeto = f"{nome}/{uf}/{ano}/anual/{nome}_{uf}_{ano}_anual.parquet"
+                    else:
+                        objeto = f"{nome}/{uf}/{ano}/{mes:02d}/{nome}_{uf}_{ano}_{mes:02d}.parquet"
+                    upload_para_object_storage(caminho, objeto, "meddata-gold")
 
     return resultados
 
@@ -409,7 +429,7 @@ def salvar_star_schema(dim_municipio, dim_hospital, dim_tempo, dim_cid10, fato_i
 # 7. Gerar Star Schema (completo)
 # ============================================================================
 
-def gerar_star_schema(df_sih, df_cnes, df_ibge, df_cid10=None, 
+def gerar_star_schema(df_sih, df_cnes, df_ibge, df_cid10=None,
                       uf=None, ano=None, mes=None, salvar=True, upload=True):
     """Executa o pipeline completo de geracao do Star Schema."""
     uf = uf or config.UF
@@ -429,15 +449,15 @@ def gerar_star_schema(df_sih, df_cnes, df_ibge, df_cid10=None,
     logger.info("\n[3/5] Gerando DIM_TEMPO...")
     dim_tempo = gerar_dim_tempo(df_sih)
 
-    logger.info("\n[4/5] Gerando DIM_CID10...")
-    dim_cid10 = gerar_dim_cid10(df_cid10)
+    logger.info("\n[4/5] Gerando DIM_DIAGNOSTICO...")
+    dim_diagnostico = gerar_dim_diagnostico(df_cid10)
 
     logger.info("\n[5/5] Gerando FATO_INTERNACAO...")
-    fato_internacao = gerar_fato_internacao(df_sih, dim_hospital, dim_municipio, dim_tempo, dim_cid10)
+    fato_internacao = gerar_fato_internacao(df_sih, dim_hospital, dim_municipio, dim_tempo, dim_diagnostico)
 
     if salvar:
         logger.info("\nSalvando Star Schema...")
-        salvar_star_schema(dim_municipio, dim_hospital, dim_tempo, dim_cid10, 
+        salvar_star_schema(dim_municipio, dim_hospital, dim_tempo, dim_diagnostico,
                           fato_internacao, uf, ano, mes, upload)
 
     logger.info("\n" + "=" * 60)
@@ -446,8 +466,10 @@ def gerar_star_schema(df_sih, df_cnes, df_ibge, df_cid10=None,
     logger.info(f"DIM_MUNICIPIO    : {len(dim_municipio):>8,} registros | {len(dim_municipio.columns):>3} colunas")
     logger.info(f"DIM_HOSPITAL     : {len(dim_hospital):>8,} registros | {len(dim_hospital.columns):>3} colunas")
     logger.info(f"DIM_TEMPO        : {len(dim_tempo):>8,} registros | {len(dim_tempo.columns):>3} colunas")
-    if dim_cid10 is not None and len(dim_cid10) > 0:
-        logger.info(f"DIM_CID10       : {len(dim_cid10):>8,} registros | {len(dim_cid10.columns):>3} colunas")
+    if dim_diagnostico is not None and len(dim_diagnostico) > 0:
+        logger.info(f"DIM_DIAGNOSTICO : {len(dim_diagnostico):>8,} registros | {len(dim_diagnostico.columns):>3} colunas")
+    else:
+        logger.info(f"DIM_DIAGNOSTICO : {'':>8} SEM DADOS | {0:>3} colunas")
     logger.info(f"FATO_INTERNACAO  : {len(fato_internacao):>8,} registros | {len(fato_internacao.columns):>3} colunas")
     logger.info("=" * 60)
 
@@ -455,7 +477,7 @@ def gerar_star_schema(df_sih, df_cnes, df_ibge, df_cid10=None,
         'dim_municipio': dim_municipio,
         'dim_hospital': dim_hospital,
         'dim_tempo': dim_tempo,
-        'dim_cid10': dim_cid10,
+        'dim_diagnostico': dim_diagnostico,
         'fato_internacao': fato_internacao
     }
 
@@ -478,16 +500,14 @@ def gerar_star_schema_anual(uf=None, ano=None, meses=None, limite_por_mes=300000
     logger.info(f"Limite por mês: {limite_por_mes:,} registros")
     logger.info("=" * 60)
 
-    # Usar transformação v2
     from transformacao_v2 import transformar_multiplos_meses
-    
+
     dados_transformados = transformar_multiplos_meses(uf, ano, meses, limite_por_mes, upload)
-    
+
     if dados_transformados is None or dados_transformados['sih'] is None:
         logger.error("Falha na transformação dos dados")
         return None
 
-    # Gerar Star Schema (mes=0 = anual)
     resultado = gerar_star_schema(
         df_sih=dados_transformados['sih'],
         df_cnes=dados_transformados['cnes'],
@@ -495,7 +515,7 @@ def gerar_star_schema_anual(uf=None, ano=None, meses=None, limite_por_mes=300000
         df_cid10=dados_transformados['cid10'],
         uf=uf,
         ano=ano,
-        mes=0,  # 0 = ano todo
+        mes=0,
         salvar=True,
         upload=upload
     )
@@ -527,33 +547,30 @@ if __name__ == "__main__":
     config.UF = args.uf
     config.ANO = args.ano
 
-    # Se especificou meses ou limite, gera Star Schema anual
-    if args.meses or args.limite != 300000:
-        meses = args.meses if args.meses else list(range(1, 13))
-        resultado = gerar_star_schema_anual(args.uf, args.ano, meses, args.limite, args.upload)
+    if args.meses:
+        resultado = gerar_star_schema_anual(args.uf, args.ano, args.meses, args.limite, args.upload)
     elif args.mes:
-        # Modo único mês (compatibilidade)
         config.MES = args.mes
-        
+
         from transformacao_v2 import transformar_sih, transformar_cnes, transformar_ibge, transformar_cid10
         from ingestao_v2 import baixar_sih, baixar_cnes_leitos, baixar_ibge, baixar_cid10
-        
+
         print("\nBaixando dados brutos...")
         df_sih_raw = baixar_sih(args.uf, args.ano, args.mes, upload=False)
         df_cnes_raw = baixar_cnes_leitos(args.uf, args.ano, args.mes, upload=False)
         df_ibge_raw = baixar_ibge(args.uf, upload=False)
         df_cid10_raw = baixar_cid10()
-        
+
         if df_sih_raw is None or df_cnes_raw is None or df_ibge_raw is None:
             print("Falha ao carregar dados brutos.")
             sys.exit(1)
-        
+
         print("\nTransformando dados...")
         df_sih = transformar_sih(df_sih_raw, args.uf, args.ano, args.mes)
         df_cnes = transformar_cnes(df_cnes_raw, args.uf, args.ano, args.mes)
         df_ibge = transformar_ibge(df_ibge_raw, args.uf)
         df_cid10 = transformar_cid10(df_cid10_raw)
-        
+
         resultado = gerar_star_schema(
             df_sih=df_sih,
             df_cnes=df_cnes,
@@ -566,7 +583,6 @@ if __name__ == "__main__":
             upload=args.upload
         )
     else:
-        # Modo automático: gera Star Schema para todos os meses
         print("Modo automático: gerando Star Schema para todos os meses de 2024")
         resultado = gerar_star_schema_anual(args.uf, args.ano, list(range(1, 13)), args.limite, args.upload)
 
@@ -577,6 +593,8 @@ if __name__ == "__main__":
         for nome, df in resultado.items():
             if df is not None and len(df) > 0:
                 print(f"{nome.upper():15} | {len(df):>8,} registros | {len(df.columns):>3} colunas")
+            elif nome == 'dim_diagnostico':
+                print(f"{nome.upper():15} | {'':>8} SEM DADOS | {0:>3} colunas")
 
         print("\nStar Schema gerado com sucesso!")
         sys.exit(0)
