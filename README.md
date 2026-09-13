@@ -81,7 +81,7 @@ flowchart LR
 
 
 
-## Arquitetura
+## Arquitetura agentes
 
 ```mermaid
 flowchart LR
