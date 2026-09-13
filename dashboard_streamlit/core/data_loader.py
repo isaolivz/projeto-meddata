@@ -2,11 +2,34 @@
 from __future__ import annotations
 
 import os
+import urllib.request
 
 import pandas as pd
 import streamlit as st
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+
+# arquivos grandes demais pro GitHub normal (>100MB) -- ficam num GitHub
+# Release em vez do repositorio, e sao baixados aqui na primeira vez que o
+# app roda (ex.: no Streamlit Cloud, onde a pasta data/ nao tem esses 2
+# arquivos). Localmente, se o arquivo ja existe em data/, nunca baixa nada.
+_RELEASE_BASE_URL = "https://github.com/isaolivz/meddata-project/releases/download/dados-v1"
+_ARQUIVOS_GRANDES = {
+    "fato_internacao_SP_2024_01_certo.csv": f"{_RELEASE_BASE_URL}/fato_internacao_SP_2024_01_certo.csv",
+    "fato_internacao_SP_2024_01_v2.csv": f"{_RELEASE_BASE_URL}/fato_internacao_SP_2024_01_v2.csv",
+}
+
+
+def _garantir_arquivo(caminho: str) -> str:
+    """Baixa o arquivo do GitHub Release se ele nao existir localmente."""
+    nome = os.path.basename(caminho)
+    if os.path.exists(caminho) or nome not in _ARQUIVOS_GRANDES:
+        return caminho
+
+    os.makedirs(os.path.dirname(caminho), exist_ok=True)
+    with st.spinner(f"Baixando {nome} (primeira vez, pode levar um minuto)..."):
+        urllib.request.urlretrieve(_ARQUIVOS_GRANDES[nome], caminho)
+    return caminho
 
 DIM_HOSPITAL_FILE = os.path.join(DATA_DIR, "dim_hospital_SP_2024_01_certo.csv")
 DIM_MUNICIPIO_FILE = os.path.join(DATA_DIR, "dim_municipio_SP_2024_01_certo.csv")
@@ -92,7 +115,7 @@ _FATO_USECOLS = [
 @st.cache_data(show_spinner="Carregando internacoes (pode levar alguns segundos)...")
 def load_fato_internacao() -> pd.DataFrame:
     df = pd.read_csv(
-        FATO_INTERNACAO_FILE,
+        _garantir_arquivo(FATO_INTERNACAO_FILE),
         sep=";",
         encoding="utf-8-sig",
         usecols=_FATO_USECOLS,
@@ -209,7 +232,7 @@ _FATO_V2_USECOLS = [
 @st.cache_data(show_spinner="Carregando internacoes v2 (pode levar alguns segundos)...")
 def load_fato_internacao_v2() -> pd.DataFrame:
     df = pd.read_csv(
-        FATO_INTERNACAO_V2_FILE,
+        _garantir_arquivo(FATO_INTERNACAO_V2_FILE),
         sep=";",
         encoding="utf-8-sig",
         usecols=_FATO_V2_USECOLS,
