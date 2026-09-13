@@ -117,15 +117,31 @@ Recorte: estado de São Paulo, ~690 mil internações no período coberto pelos 
 
 ```
 projeto-meddata/
-├── src/                     # pipeline: ingestão, transformação e carga dos dados públicos
-├── dashboard_streamlit/     # aplicação Streamlit
+├── src/                        # pipeline: ingestão, integração, transformação, validação
+│   ├── ingestao_v2.py
+│   ├── integracao_v2.py
+│   ├── transformacao_v2.py
+│   ├── validacao.py
+│   └── carga_analitica.py      # carrega os dados (Gold) no Oracle Autonomous Database
+├── .oci/                       # setup do Oracle Cloud (schema, upload pro Object Storage/ADB)
+├── data/
+│   └── reference/               # CID-10, IBGE
+├── analise_exploratoria/        # EDA inicial: notebook, gráficos, dicionário de dados
+├── notebooks/                    # EDA por fonte (SIH, CNES, IBGE) + validação da integração
+├── dashboard_streamlit/          # MedData Platform (aplicação Streamlit)
 │   ├── app.py
-│   ├── pages/               # Monitoramento, Visão Geral, Pergunte aos Dados, Chat MedData
-│   ├── core/                # lógica: data_loader, consultas, agentes, Select AI, RAG
-│   └── README.md            # documentação técnica detalhada do dashboard
-├── notebooks/                # análises exploratórias e validação do modelo de previsão
-├── analise_exploratoria/     # dicionário de dados e estatísticas descritivas
-└── data/                     # dados de referência (CID-10, IBGE)
+│   ├── pages/                    # Monitoramento, Visão Geral, Pergunte aos Dados, Chat MedData
+│   ├── core/                     # data_loader, consultas, agentes, Select AI, RAG
+│   ├── data/                     # CSVs (V1/V2) usados pelo dashboard
+│   ├── notebooks/                 # validação do modelo de previsão (painel_preditivo)
+│   └── README.md                  # documentação técnica detalhada do dashboard
+├── config.py                     # configuração compartilhada do pipeline (UF, ano, mês)
+├── CID-10-SUBCATEGORIAS.CSV       # tabela de referência de diagnósticos
+├── requirements.txt               # dependências do pipeline (src/)
+└── LICENSE
+
+> `dashboard_streamlit/` tem seu próprio `requirements.txt` (dependências do app: Streamlit, Plotly, oracledb, LangChain) — separado das dependências do pipeline de dados na raiz.
+
 ```
 
 > Documentação técnica completa do dashboard (schema dos dados, como rodar, configuração do Select AI): [`dashboard_streamlit/README.md`](dashboard_streamlit/README.md).
