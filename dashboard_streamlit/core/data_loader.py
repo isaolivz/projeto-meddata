@@ -13,7 +13,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 # Release em vez do repositorio, e sao baixados aqui na primeira vez que o
 # app roda (ex.: no Streamlit Cloud, onde a pasta data/ nao tem esses 2
 # arquivos). Localmente, se o arquivo ja existe em data/, nunca baixa nada.
-_RELEASE_BASE_URL = "https://github.com/isaolivz/meddata-project/releases/download/dados-v1"
+_RELEASE_BASE_URL = "https://github.com/isaolivz/projeto-meddata/releases/download/dados-v1"
 _ARQUIVOS_GRANDES = {
     "fato_internacao_SP_2024_01_certo.csv": f"{_RELEASE_BASE_URL}/fato_internacao_SP_2024_01_certo.csv",
     "fato_internacao_SP_2024_01_v2.csv": f"{_RELEASE_BASE_URL}/fato_internacao_SP_2024_01_v2.csv",
