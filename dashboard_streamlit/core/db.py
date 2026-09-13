@@ -6,7 +6,9 @@ propria consulta e pode estourar o limite de tokens do modelo.
 
 from __future__ import annotations
 
+import base64
 import os
+import tempfile
 from dataclasses import dataclass
 
 import oracledb
@@ -14,6 +16,58 @@ import pandas as pd
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def _sincronizar_secrets_com_env() -> None:
+    """No Streamlit Community Cloud nao existe arquivo .env -- as mesmas
+    variaveis ficam em st.secrets (coladas na area 'Secrets' do app, no
+    site). Copia pro os.environ, sem sobrescrever o que ja estiver definido
+    (rodando local com .env, isso aqui nao muda nada)."""
+    try:
+        import streamlit as st
+
+        for chave, valor in st.secrets.items():
+            if isinstance(valor, str) and chave not in os.environ:
+                os.environ[chave] = valor
+    except Exception:
+        pass
+
+
+_sincronizar_secrets_com_env()
+
+_ARQUIVOS_WALLET = (
+    "cwallet.sso", "ewallet.p12", "ewallet.pem", "keystore.jks",
+    "ojdbc.properties", "sqlnet.ora", "tnsnames.ora", "truststore.jks",
+)
+
+
+def _preparar_wallet_de_secrets() -> str | None:
+    """Reconstroi a wallet a partir de st.secrets['wallet_b64'] (usado no
+    Streamlit Cloud, onde a pasta wallet/ nao existe -- ela nunca e enviada
+    ao GitHub por seguranca). Retorna o caminho da wallet reconstruida, ou
+    None se nao houver esse secret configurado (nesse caso, quem chamou usa
+    a pasta wallet/ local normalmente, sem nenhuma mudanca de comportamento).
+    """
+    try:
+        import streamlit as st
+
+        wallet_b64 = st.secrets.get("wallet_b64")
+    except Exception:
+        return None
+    if not wallet_b64:
+        return None
+
+    destino = os.path.join(tempfile.gettempdir(), "meddata_wallet")
+    os.makedirs(destino, exist_ok=True)
+    for nome in _ARQUIVOS_WALLET:
+        conteudo_b64 = wallet_b64.get(nome)
+        if not conteudo_b64:
+            continue
+        caminho = os.path.join(destino, nome)
+        if not os.path.exists(caminho):
+            with open(caminho, "wb") as arquivo:
+                arquivo.write(base64.b64decode(conteudo_b64))
+    return destino
 
 
 class ConfiguracaoAusente(RuntimeError):
@@ -32,7 +86,7 @@ def _env(nome: str, obrigatorio: bool = True, default: str | None = None) -> str
 
 def get_connection() -> oracledb.Connection:
     """Abre uma conexao com o Oracle ADB usando a wallet do projeto."""
-    wallet_dir = _env("ORACLE_WALLET_DIR", default="./wallet")
+    wallet_dir = _preparar_wallet_de_secrets() or _env("ORACLE_WALLET_DIR", default="./wallet")
 
     return oracledb.connect(
         user=_env("ORACLE_USER"),
