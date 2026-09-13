@@ -1,27 +1,91 @@
 # MedData
 <img width="1024" height="250" alt="image" src="https://github.com/user-attachments/assets/e8e18a8a-e85a-48f6-a564-b0327ad5fab6" />
 
-Sistema de apoio à gestão da rede hospitalar de São Paulo, com agentes de IA sobre o Oracle Autonomous Database — desenvolvido para o **Challenge Oracle 2026**.
 
-![Python](https://img.shields.io/badge/Python-3.12-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-dashboard-FF4B4B)
-![Oracle](https://img.shields.io/badge/Oracle-Autonomous%20Database-red)
-![License](https://img.shields.io/badge/license-MIT-green)
+**Apoio à gestão da rede hospitalar de São Paulo com IA sobre o Oracle Autonomous Database.**
+Desenvolvido para o Challenge Oracle 2026.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.12-blue" alt="Python 3.12">
+  <img src="https://img.shields.io/badge/Streamlit-dashboard-FF4B4B" alt="Streamlit">
+  <img src="https://img.shields.io/badge/Oracle-Autonomous%20Database-red" alt="Oracle Autonomous Database">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License MIT">
+</p>
+
+---
 
 ## O problema
 
-A rede hospitalar de São Paulo processa centenas de milhares de internações por mês, com hospitais operando perto (ou acima) da capacidade em diversos municípios. Gestores precisam identificar rapidamente **onde está o risco de colapso**, **para onde encaminhar pacientes sem vaga** e **como a demanda deve evoluir** — decisões que hoje dependem de análise manual de planilhas e relatórios dispersos.
+A rede hospitalar de São Paulo processa centenas de milhares de internações por mês, com hospitais operando perto — ou acima — da capacidade em diversos municípios. Gestores precisam responder rápido a 3 perguntas:
 
-O MedData usa dados reais de internações (SIH/DataSUS), leitos (CNES) e municípios (IBGE) para responder essas perguntas em linguagem natural, combinando cálculos estatísticos validados com consultas geradas por IA direto no banco.
+-  **Onde está o risco de colapso agora?**
+-  **Para onde encaminhar um paciente quando não há vaga?**
+-  **Como a demanda vai evoluir nos próximos dias?**
+
+Hoje essas respostas dependem de análise manual de planilhas e relatórios dispersos. O MedData usa dados reais de internações (SIH/DataSUS), leitos (CNES) e municípios (IBGE) para responder essas perguntas em linguagem natural — combinando cálculos estatísticos validados com consultas geradas por IA direto no banco.
+
+
+## 🔗 Arquitetura do MVP
+
+```mermaid
+flowchart LR
+    subgraph FONTES["Fontes públicas"]
+        direction TB
+        SIH["SIH<br/>internações"]
+        CNES["CNES<br/>leitos"]
+        IBGE["IBGE<br/>municípios"]
+        CID["CID-10<br/>diagnósticos"]
+    end
+
+    subgraph PIPELINE["Pipeline (src/)"]
+        direction LR
+        ING["Ingestão"] --> BRONZE[("Bronze")] --> TRANS["Transformação"] --> SILVER[("Silver")] --> INTEG["Integração"] --> GOLD[("Gold")] --> VALID["Validação"] --> CARGA["Carga<br/>Analítica"]
+    end
+
+    subgraph ORACLE["Oracle Autonomous Database"]
+        direction LR
+        DIMFATO[("DIM_* / FATO")] --> VIEWS["Views<br/>analíticas"] --> SELECTAI["Select AI<br/>(Cohere, via wallet)"]
+    end
+
+    subgraph CONSUMO["Consumo"]
+        direction TB
+        PLATFORM["MedData Platform<br/>(Streamlit) — 3 agentes + RAG"]
+        APEX["Oracle APEX<br/>relatório com IA"]
+    end
+
+    SIH --> ING
+    CNES --> ING
+    IBGE --> ING
+    CID --> ING
+    CARGA --> DIMFATO
+    SELECTAI --> PLATFORM
+    SELECTAI --> APEX
+    VIEWS --> APEX
+    PLATFORM -.->|link| APEX
+    PLATFORM --> GESTOR["Recomendação<br/>pro gestor"]
+    APEX --> GESTOR
+
+```
+
+
+## Screenshot
+
+<img width="1550" height="741" alt="image" src="https://github.com/user-attachments/assets/2c4f8117-97ce-409d-bc6e-f27b1e4eff1c" />
+<img width="1600" height="771" alt="image" src="https://github.com/user-attachments/assets/83594514-1449-40f9-b80c-3c65a51a08e4" />
+<img width="1600" height="767" alt="image" src="https://github.com/user-attachments/assets/3db8acf1-53b5-4894-8593-fbf38fd371f1" />
+<img width="1600" height="810" alt="image" src="https://github.com/user-attachments/assets/89be40eb-5546-4212-9fd9-08e6253e9d52" />
+<img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/7923f2d0-1ce6-4d7f-a592-3b4bb32b6c7f" />
+<img width="1600" height="771" alt="image" src="https://github.com/user-attachments/assets/319a248b-75d0-4ebe-8488-6da6a50c46eb" />
+<img width="1600" height="775" alt="image" src="https://github.com/user-attachments/assets/08365dc1-a30f-4514-bef9-e23cf1b6feea" />
+<img width="1600" height="839" alt="image" src="https://github.com/user-attachments/assets/44026ad3-bcc8-41d8-a62a-6a2649c0a0f9" />
+
+
+
 
 ## 🔗 Acesse o dashboard
 
 **[projeto-meddata.streamlit.app](https://projeto-meddata-3qioneoard7hqeqx9srbsn.streamlit.app/)**
 
-## Screenshot
-
-<!-- adicione aqui um print da tela de Monitoramento, ex.: -->
-<!-- ![Dashboard MedData](docs/screenshot-monitoramento.png) -->
 
 ## Arquitetura
 
