@@ -1,0 +1,796 @@
+<!doctype html>
+<title>MedData no APEX</title>
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface-tint: #EFEBE2;
+    --text: #1C1917;
+    --text-secondary: #6B6862;
+    --border: #E4E0D8;
+    --accent: #0F6B72;
+    --accent-soft: #E5F1F1;
+    --critical: #B0413E;
+    --critical-soft: #F8E9E8;
+    --warning: #8A6414;
+    --warning-soft: #F6EEDD;
+    --code-bg: #101B1D;
+    --code-text: #E7ECEA;
+    --code-comment: #7FA6A2;
+    --code-accent: #7BD4CF;
+    --shadow: 0 1px 2px rgba(28,25,23,0.06), 0 8px 24px -12px rgba(28,25,23,0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12181A;
+      --surface: #182123;
+      --surface-tint: #1E2A2C;
+      --text: #E8E6E1;
+      --text-secondary: #9CA6A5;
+      --border: #2A3538;
+      --accent: #58C7C2;
+      --accent-soft: rgba(88,199,194,0.12);
+      --critical: #E58884;
+      --critical-soft: rgba(229,136,132,0.12);
+      --warning: #E3B15E;
+      --warning-soft: rgba(227,177,94,0.12);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12181A;
+    --surface: #182123;
+    --surface-tint: #1E2A2C;
+    --text: #E8E6E1;
+    --text-secondary: #9CA6A5;
+    --border: #2A3538;
+    --accent: #58C7C2;
+    --accent-soft: rgba(88,199,194,0.12);
+    --critical: #E58884;
+    --critical-soft: rgba(229,136,132,0.12);
+    --warning: #E3B15E;
+    --warning-soft: rgba(227,177,94,0.12);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  @font-face { font-family: 'system-fallback'; src: local(system-ui); }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, pre, .mono { font-family: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+
+  header.hero {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.6rem;
+  }
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; letter-spacing: -0.01em;
+    margin: 0 0 0.6rem; text-wrap: balance;
+  }
+  .lede { color: var(--text-secondary); font-size: 1.05rem; max-width: 62ch; }
+
+  .plano {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.75rem; margin-top: 1.5rem;
+  }
+  .plano-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+  .plano-item .dia { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+  .plano-item .oque { font-weight: 600; margin-top: 0.25rem; font-size: 0.95rem; }
+  .plano-item .detalhe { color: var(--text-secondary); font-size: 0.82rem; margin-top: 0.2rem; }
+
+  nav.toc {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.75rem 0 0;
+  }
+  nav.toc a {
+    font-size: 0.82rem; font-weight: 600; color: var(--accent); text-decoration: none;
+    background: var(--accent-soft); padding: 0.35rem 0.8rem; border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  nav.toc a:hover { border-color: var(--accent); }
+
+  section.pagina { margin-top: 3.5rem; scroll-margin-top: 1.5rem; }
+  .pagina-titulo {
+    display: flex; align-items: baseline; gap: 0.7rem; margin-bottom: 0.3rem;
+  }
+  .pagina-titulo .numero {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--text-secondary);
+  }
+  .pagina-titulo h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+  .pagina-intro { color: var(--text-secondary); max-width: 68ch; margin-bottom: 1.5rem; }
+
+  .passo {
+    border: 1px solid var(--border); border-radius: 10px; background: var(--surface);
+    padding: 1.1rem 1.3rem 1.3rem; margin-bottom: 1rem; box-shadow: var(--shadow);
+  }
+  .passo-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .passo-titulo { font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 0.55rem; }
+  .tipo-regiao {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    background: var(--surface-tint); color: var(--text-secondary); padding: 0.2rem 0.55rem; border-radius: 5px;
+    white-space: nowrap;
+  }
+  label.check {
+    display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-secondary);
+    cursor: pointer; user-select: none; white-space: nowrap;
+  }
+  label.check input { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+  .passo p.explicacao { margin: 0.3rem 0 0.7rem; font-size: 0.92rem; color: var(--text-secondary); }
+  .passo p.explicacao strong { color: var(--text); }
+
+  pre.sql {
+    background: var(--code-bg); color: var(--code-text); border-radius: 8px;
+    padding: 0.9rem 1.1rem; overflow-x: auto; font-size: 0.82rem; line-height: 1.6;
+    margin: 0;
+  }
+  pre.sql .c { color: var(--code-comment); }
+  pre.sql .k { color: var(--code-accent); }
+
+  .mapeamento {
+    margin-top: 0.6rem; font-size: 0.82rem; color: var(--text-secondary);
+  }
+  .mapeamento code { background: var(--surface-tint); color: var(--text); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+  .aviso {
+    border-left: 3px solid var(--warning); background: var(--warning-soft);
+    border-radius: 0 6px 6px 0; padding: 0.7rem 1rem; margin: 1rem 0;
+    font-size: 0.88rem; color: var(--text);
+  }
+  .aviso strong { color: var(--warning); }
+  .critico {
+    border-left: 3px solid var(--critical); background: var(--critical-soft);
+    border-radius: 0 6px 6px 0; padding: 0.9rem 1.1rem; margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  .critico strong { color: var(--critical); }
+
+  table.ref {
+    width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem;
+  }
+  table.ref th, table.ref td {
+    text-align: left; padding: 0.45rem 0.7rem; border-bottom: 1px solid var(--border);
+  }
+  table.ref th { color: var(--text-secondary); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  table.ref td.mono { font-family: 'IBM Plex Mono', monospace; }
+  .ref-wrap { overflow-x: auto; }
+
+  .rodape {
+    margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+    font-size: 0.82rem; color: var(--text-secondary);
+  }
+
+  .progresso {
+    position: sticky; top: 0; z-index: 5; background: var(--bg);
+    padding: 0.6rem 0 0.9rem; margin-bottom: -0.5rem;
+    border-bottom: 1px solid transparent;
+  }
+  .progresso.colado { border-color: var(--border); }
+  .barra { height: 6px; background: var(--surface-tint); border-radius: 999px; overflow: hidden; }
+  .barra > div { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.25s ease; width: 0%; }
+  .progresso-texto { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.35rem; }
+
+  .diagrama { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.7rem; margin: 1rem 0 1.5rem; }
+  .painel { border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 0.9rem; background: var(--surface); }
+  .painel.numero-1 { border-top: 3px solid var(--accent); }
+  .painel.numero-2 { border-top: 3px solid var(--text-secondary); }
+  .painel.numero-3 { border-top: 3px solid var(--warning); }
+  .painel-nome { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.3rem; }
+  .painel-desc { font-size: 0.8rem; color: var(--text-secondary); }
+
+  ol.receita { margin: 0.8rem 0; padding-left: 1.3rem; font-size: 0.9rem; }
+  ol.receita li { margin-bottom: 0.55rem; }
+  ol.receita strong { color: var(--accent); }
+</style>
+
+<div class="wrap">
+
+  <div class="progresso" id="progresso">
+    <div class="barra"><div id="barra-fill"></div></div>
+    <div class="progresso-texto" id="progresso-texto">0 de 0 passos marcados</div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">MedData · Guia de construção</div>
+    <h1>Levando o MedData pro Oracle APEX</h1>
+    <p class="lede">
+      Seu Autonomous Database já tem tudo pronto — inclusive views que fazem boa parte do
+      trabalho pesado que o Streamlit faz em Python. Este guia troca "aprenda APEX do zero"
+      por "cole esta query, marque esta caixinha", com o SQL real já verificado direto no
+      seu banco.
+    </p>
+
+    <div class="plano">
+      <div class="plano-item">
+        <div class="dia">Dia 1</div>
+        <div class="oque">Monitoramento</div>
+        <div class="detalhe">O coração do projeto — comece aqui.</div>
+      </div>
+      <div class="plano-item">
+        <div class="dia">Dia 2</div>
+        <div class="oque">Visão Geral</div>
+        <div class="detalhe">Mais regiões, mas nada novo em técnica.</div>
+      </div>
+      <div class="plano-item">
+        <div class="dia">Dia 3</div>
+        <div class="oque">Pergunte aos Dados</div>
+        <div class="detalhe">A parte mais impressionante — deixe pro fim, com o APEX já familiar.</div>
+      </div>
+      <div class="plano-item">
+        <div class="dia">Se sobrar tempo</div>
+        <div class="oque">Cores por status, mapa</div>
+        <div class="detalhe">Bônus marcados como "opcional" abaixo.</div>
+      </div>
+    </div>
+
+    <nav class="toc">
+      <a href="#abrir">Abrir o APEX</a>
+      <a href="#erro-comum">"Tabela não existe" (ORA-00942)</a>
+      <a href="#anatomia">Onde clicar (anatomia da tela)</a>
+      <a href="#sidebar">Menu lateral (sidebar)</a>
+      <a href="#conceitos">Conceitos em 1 minuto</a>
+      <a href="#monitoramento">Monitoramento</a>
+      <a href="#visao-geral">Visão Geral</a>
+      <a href="#pergunte">Pergunte aos Dados</a>
+      <a href="#fora">O que fica de fora</a>
+      <a href="#referencia">Referência de tabelas</a>
+    </nav>
+  </header>
+
+  <section class="pagina" id="abrir">
+    <div class="pagina-titulo"><span class="numero">00</span><h2>Abrir o APEX e criar o app</h2></div>
+    <p class="pagina-intro">Cinco passos, uma vez só — depois disso você só cria páginas e regiões.</p>
+
+    <div class="passo">
+      <p class="explicacao">
+        <strong>1.</strong> No console da OCI, abra seu Autonomous Database → botão
+        <strong>"Database Actions"</strong> → aba "Development" → ícone <strong>APEX</strong>.
+        Isso abre o workspace já ligado ao mesmo banco que o Select AI usa hoje.<br>
+        <strong>2.</strong> No APEX, vá em <strong>App Builder → Create → New Application</strong>,
+        dê um nome (ex.: "MedData") e clique em Create Application. Isso cria uma app com uma
+        Home page vazia.<br>
+        <strong>3.</strong> Dentro da app, <strong>Create Page → Blank Page</strong> pra cada página
+        que você for montar (uma por seção deste guia).<br>
+        <strong>4.</strong> Dentro de uma página, <strong>Create Region</strong> — cada bloco deste
+        guia (um gráfico, uma tabela, os KPIs) é uma region separada.<br>
+        <strong>5.</strong> Toda region baseada em dado tem uma aba <strong>Source</strong> — é lá
+        que você cola a query SQL de cada passo abaixo.
+      </p>
+    </div>
+  </section>
+
+  <section class="pagina" id="erro-comum">
+    <div class="pagina-titulo"><span class="numero">00a</span><h2>Se aparecer "tabela ou visão não existe"</h2></div>
+    <p class="pagina-intro">
+      Erro real que apareceu no primeiro teste deste guia — melhor resolver logo no início,
+      antes de bater em todas as 12 regions do guia.
+    </p>
+    <div class="critico">
+      <strong>ORA-00942: a tabela ou visão "WKSP_ALGUMACOISA"."FATO_INTERNACAO_V2" não existe.</strong>
+      Isso acontece porque o workspace do APEX usa um schema próprio (geralmente vazio),
+      diferente do schema <strong>ADMIN</strong>, onde os dados de verdade moram. Toda query
+      deste guia já está escrita com o prefixo <code>ADMIN.</code> na frente de cada tabela por
+      causa disso — mas antes de rodar a primeira, você precisa liberar o acesso uma única vez.
+    </div>
+    <div class="passo">
+      <p class="explicacao">
+        <strong>Passo único, feito uma vez:</strong> na tela <strong>Database Actions</strong>
+        (a mesma de onde você abriu o APEX), clique em <strong>SQL</strong> em vez de "APEX" —
+        isso abre um editor conectado como <code>ADMIN</code>. Cole e rode:
+      </p>
+      <pre class="sql"><span class="c">-- Troque WKSP_ALGUMACOISA pelo nome real do schema que apareceu no SEU erro</span>
+GRANT SELECT ON ADMIN.FATO_INTERNACAO_V2 TO WKSP_ALGUMACOISA;
+GRANT SELECT ON ADMIN.DIM_HOSPITAL_V2 TO WKSP_ALGUMACOISA;
+GRANT SELECT ON ADMIN.DIM_MUNICIPIO_V2 TO WKSP_ALGUMACOISA;
+GRANT SELECT ON ADMIN.DIM_TEMPO_V2 TO WKSP_ALGUMACOISA;
+GRANT SELECT ON ADMIN.DIM_DIAGNOSTICO_V2 TO WKSP_ALGUMACOISA;
+GRANT SELECT ON ADMIN.VW_ALERTAS_COLAPSO TO WKSP_ALGUMACOISA;
+GRANT SELECT ON ADMIN.VW_MUNICIPIO_INTERNACOES TO WKSP_ALGUMACOISA;
+GRANT SELECT ON ADMIN.VW_DIAGNOSTICO_SIMPLES TO WKSP_ALGUMACOISA;</pre>
+      <p class="explicacao">
+        O nome do seu schema aparece exatamente no texto do erro, entre aspas, antes do ponto
+        (ex.: <code>"WKSP_MEDDATA"</code>). Depois de rodar isso uma vez, toda query com
+        <code>ADMIN.</code> na frente do nome da tabela passa a funcionar normalmente.
+      </p>
+    </div>
+    <div class="aviso">
+      <strong>Bônus:</strong> se o texto do seu SQL aparecer traduzido pro português de um jeito
+      estranho ("SELECIONE", "ONDE", "UNIÃO TOTAL") dentro do editor do APEX, é o Chrome
+      traduzindo a página automaticamente — desative em "..." → Traduzir → Nunca traduzir este
+      site, pra não arriscar o código real ser alterado.
+    </div>
+  </section>
+
+  <section class="pagina" id="anatomia">
+    <div class="pagina-titulo"><span class="numero">00b</span><h2>Onde clicar — anatomia da tela</h2></div>
+    <p class="pagina-intro">
+      Quando você abre uma página no <strong>Page Designer</strong> (é assim que se chama a
+      tela de edição), ela sempre tem 3 painéis. Ler essa tela é 80% do trabalho de aprender APEX.
+    </p>
+
+    <div class="diagrama">
+      <div class="painel numero-1">
+        <div class="painel-nome">1 · Rendering (esquerda)</div>
+        <div class="painel-desc">
+          A árvore da página: Regions, Items, Buttons, Dynamic Actions. É aqui que você
+          <strong>cria</strong> coisas novas (botão direito → Create) e navega entre o que já existe.
+        </div>
+      </div>
+      <div class="painel numero-2">
+        <div class="painel-nome">2 · Canvas (meio)</div>
+        <div class="painel-desc">
+          Uma prévia de como a página vai ficar. Clicar numa region aqui seleciona ela — mesmo
+          efeito de clicar nela na árvore da esquerda.
+        </div>
+      </div>
+      <div class="painel numero-3">
+        <div class="painel-nome">3 · Property Editor (direita)</div>
+        <div class="painel-desc">
+          Mostra as propriedades de <strong>quem estiver selecionado</strong>. É aqui que você
+          escreve o Título, escolhe o Type, e — rolando pra baixo — encontra a seção
+          <strong>Source</strong> com o campo <strong>SQL Query</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="passo">
+      <div class="passo-titulo">Receita genérica — vale pra toda region deste guia</div>
+      <ol class="receita">
+        <li>Na árvore <strong>Rendering</strong> (painel 1), clique com o botão direito em
+          <strong>Regions</strong> → <strong>Create Region</strong>.</li>
+        <li>A region nova aparece selecionada e o Property Editor (painel 3) abre nela.
+          Primeiro campo, <strong>Title</strong> — dê um nome (ex.: "KPIs", "Ranking de hospitais").</li>
+        <li>Logo abaixo, o campo <strong>Type</strong> — escolha o tipo: <em>Cards</em>,
+          <em>Chart</em>, <em>Interactive Report</em>, <em>Map Region</em>... A tela muda de
+          acordo com o que você escolher.</li>
+        <li>Role o Property Editor pra baixo até achar a seção <strong>Source</strong>. No campo
+          <strong>SQL Query</strong>, apague o texto de exemplo e cole a query deste guia.</li>
+        <li>Configure o que for específico do tipo escolhido — <strong>veja a tabela logo
+          abaixo</strong>, porque colar o SQL sozinho não é suficiente pra gráfico e mapa.</li>
+        <li>No topo da tela, clique no ícone de disquete (<strong>Save</strong>), depois no botão
+          verde ▶ (<strong>Run Page</strong>) — abre uma aba nova já com a página funcionando.</li>
+      </ol>
+    </div>
+
+    <div class="passo">
+      <div class="passo-titulo">O que fazer depois de colar o SQL, por tipo de region</div>
+      <p class="explicacao">
+        Essa é a resposta pra "colando a query já sai o gráfico?" — depende do tipo:
+        <strong>Cards</strong> e <strong>Interactive Report</strong> praticamente só precisam do
+        SQL; <strong>Chart</strong> e <strong>Map Region</strong> pedem um passo extra pra dizer
+        qual coluna é o quê.
+      </p>
+      <div class="ref-wrap">
+        <table class="ref">
+          <tr><th>Tipo de region</th><th>Depois de colar o SQL...</th></tr>
+          <tr>
+            <td class="mono">Cards</td>
+            <td>No Property Editor, procure <strong>Column Mapping</strong> e diga qual coluna é o
+              <strong>Title</strong> e qual é o <strong>Text/Badge</strong> — no seu caso, sempre
+              <code>TITULO</code> e <code>VALOR</code>.</td>
+          </tr>
+          <tr>
+            <td class="mono">Chart</td>
+            <td>Na árvore (painel 1), a region ganha um filho chamado <strong>Series</strong> —
+              clique nele e, no Property Editor, defina <strong>Label Column</strong> e
+              <strong>Value Column</strong> com os nomes das colunas do seu SELECT. O tipo do
+              desenho (barra/linha/pizza) fica no campo <strong>Type</strong> da region principal,
+              seção <strong>Appearance</strong>.</td>
+          </tr>
+          <tr>
+            <td class="mono">Interactive Report</td>
+            <td>Nada — ele já desenha a tabela com as colunas que vierem do SELECT.</td>
+          </tr>
+          <tr>
+            <td class="mono">Map Region</td>
+            <td>Na árvore, botão direito em <strong>Map Layers</strong> (dentro da region) →
+              <strong>Create Map Layer</strong>. No Property Editor dessa camada, em
+              <strong>Location</strong>, escolha "Latitude/Longitude Columns" e selecione as
+              colunas certas.</td>
+          </tr>
+          <tr>
+            <td class="mono">Function Body returning SQL Query<br>(usado no Pergunte aos Dados)</td>
+            <td>Antes de colar, na seção Source mude o campo <strong>Location</strong> de
+              "Local Database" pra <strong>"Function Body returning SQL Query"</strong> — só
+              depois desse clique o campo vira um editor de PL/SQL onde cabe o bloco
+              inteiro (<code>DECLARE...END;</code>).</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="pagina" id="sidebar">
+    <div class="pagina-titulo"><span class="numero">00c</span><h2>Menu lateral (o "sidebar")</h2></div>
+    <p class="pagina-intro">
+      Boa notícia: diferente do Streamlit (onde o menu lateral nasce dos arquivos numerados em
+      <code>pages/</code>), no APEX ele já vem pronto. Você só precisa garantir que cada página
+      está cadastrada nele.
+    </p>
+    <div class="passo">
+      <p class="explicacao">
+        <strong>Pra conferir ou editar:</strong> dentro da sua app, vá em
+        <strong>Shared Components</strong> (ícone de peças de quebra-cabeça, ou no menu superior)
+        → seção <strong>Navigation</strong> → <strong>Navigation Menu</strong>. Ali aparece uma
+        entrada por página — dá pra arrastar pra reordenar (mesma ideia dos prefixos
+        <code>1_</code>, <code>2_</code>... do Streamlit), renomear, ou clicar em
+        <strong>Create Entry</strong> pra adicionar uma página que não apareceu sozinha.
+      </p>
+      <p class="explicacao">
+        Ao criar uma página pelo assistente, se aparecer uma pergunta do tipo
+        <strong>"Add Page to Navigation Menu?"</strong>, deixe marcado "Yes" — é isso que faz ela
+        aparecer no menu sem precisar voltar em Shared Components depois.
+      </p>
+    </div>
+  </section>
+
+  <section class="pagina" id="conceitos">
+    <div class="pagina-titulo"><span class="numero">01</span><h2>Conceitos em 1 minuto</h2></div>
+    <p class="pagina-intro">
+      Se você já entende Streamlit, é só trocar o vocabulário:
+    </p>
+    <div class="ref-wrap">
+      <table class="ref">
+        <tr><th>No Streamlit</th><th>No APEX</th></tr>
+        <tr><td class="mono">pages/2_Visao_Geral.py</td><td class="mono">uma Page (página)</td></tr>
+        <tr><td class="mono">st.columns() / st.container()</td><td class="mono">uma Region dentro da página</td></tr>
+        <tr><td class="mono">px.bar(df, ...)</td><td class="mono">Region tipo "Chart"</td></tr>
+        <tr><td class="mono">st.metric(...)</td><td class="mono">Region tipo "Cards" (uma linha = um card)</td></tr>
+        <tr><td class="mono">st.dataframe(df)</td><td class="mono">Region tipo "Interactive Report"</td></tr>
+        <tr><td class="mono">a query dentro da função Python</td><td class="mono">a query na aba "Source" da region</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="pagina" id="monitoramento">
+    <div class="pagina-titulo"><span class="numero">02</span><h2>Monitoramento</h2></div>
+    <p class="pagina-intro">
+      Equivalente a <code>pages/1_Monitoramento.py</code>. Tudo aqui usa a view
+      <code>VW_ALERTAS_COLAPSO</code>, que já vem com ocupação e nível de alerta calculados
+      por hospital.
+    </p>
+
+    <div class="critico">
+      <strong>Antes de começar — um dado real com problema:</strong> cerca de 62 hospitais
+      (de 1.466) têm <code>LEITOS_TOTAIS</code> inflado por um bug de geração de dado
+      (confirmado direto no banco: um hospital aparece com 1.804 leitos). Toda query abaixo
+      que soma leitos já inclui <code>WHERE leitos_totais &lt; 500</code> como filtro defensivo
+      — isso é uma limitação de dado conhecida e documentada, não um erro seu. Se o professor
+      perguntar, é um ponto a favor citar que vocês identificaram e trataram isso conscientemente.
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">KPIs (internações, ocupação, leitos livres, alertas) <span class="tipo-regiao">Cards</span></div>
+        <label class="check"><input type="checkbox" data-id="mon-kpi"> feito</label>
+      </div>
+      <p class="explicacao">Cada linha do resultado vira um card. No assistente da region, mapeie <code>TITULO</code> como título e <code>VALOR</code> como o texto do card.</p>
+      <pre class="sql"><span class="c">-- Ocupacao usa SOMA/SOMA, nao media simples das taxas -- ver nota abaixo</span>
+SELECT 'Internações no total' AS titulo, TO_CHAR(COUNT(*)) AS valor
+FROM ADMIN.FATO_INTERNACAO_V2
+UNION ALL
+SELECT 'Ocupação média da rede',
+       TO_CHAR(ROUND(SUM(leitos_ocupados) / SUM(leitos_totais) * 100, 1)) || '%'
+FROM ADMIN.VW_ALERTAS_COLAPSO WHERE leitos_totais &lt; 500
+UNION ALL
+SELECT 'Leitos disponíveis',
+       TO_CHAR(SUM(leitos_totais - leitos_ocupados))
+FROM ADMIN.VW_ALERTAS_COLAPSO WHERE leitos_totais &lt; 500
+UNION ALL
+SELECT 'Hospitais em alerta crítico', TO_CHAR(COUNT(*))
+FROM ADMIN.VW_ALERTAS_COLAPSO
+WHERE nivel_alerta IN ('Vermelho','Laranja') AND leitos_totais &lt; 500</pre>
+      <div class="aviso">
+        <strong>Importante:</strong> some SUM(leitos_ocupados)/SUM(leitos_totais), nunca
+        AVG(taxa_ocupacao) direto — essa foi uma inconsistência real que já apareceu no
+        projeto (dava 6% numa conta e 11-12% na outra, pro mesmo período). A ponderada é a
+        correta.
+      </div>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Ranking dos hospitais mais críticos <span class="tipo-regiao">Chart · Bar</span></div>
+        <label class="check"><input type="checkbox" data-id="mon-ranking"> feito</label>
+      </div>
+      <p class="explicacao">Barra horizontal. No assistente: Label = <code>HOSPITAL</code>, Value = <code>TAXA_OCUPACAO</code>.</p>
+      <pre class="sql">SELECT nome_hospital || ' (' || nome_municipio_hospital || ')' AS hospital,
+       taxa_ocupacao,
+       nivel_alerta
+FROM ADMIN.VW_ALERTAS_COLAPSO
+WHERE leitos_totais &lt; 500
+ORDER BY taxa_ocupacao DESC
+FETCH FIRST 10 ROWS ONLY</pre>
+      <p class="mapeamento">Opcional (se sobrar tempo): use <code>NIVEL_ALERTA</code> como "Series By" pra colorir automaticamente por status.</p>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Tabela detalhada de hospitais críticos <span class="tipo-regiao">Interactive Report</span></div>
+        <label class="check"><input type="checkbox" data-id="mon-tabela"> feito</label>
+      </div>
+      <p class="explicacao">A mesma view, sem limite de linhas — o Interactive Report já dá busca e ordenação de graça.</p>
+      <pre class="sql">SELECT id_hospital, nome_hospital, nome_municipio_hospital,
+       leitos_totais, leitos_ocupados, taxa_ocupacao, nivel_alerta
+FROM ADMIN.VW_ALERTAS_COLAPSO
+WHERE leitos_totais &lt; 500
+ORDER BY taxa_ocupacao DESC</pre>
+    </div>
+  </section>
+
+  <section class="pagina" id="visao-geral">
+    <div class="pagina-titulo"><span class="numero">03</span><h2>Visão Geral</h2></div>
+    <p class="pagina-intro">
+      Equivalente a <code>pages/2_Visao_Geral.py</code>. Mesma técnica do Monitoramento — só
+      muda a query de cada region.
+    </p>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">KPIs de volume <span class="tipo-regiao">Cards</span></div>
+        <label class="check"><input type="checkbox" data-id="vg-kpi"> feito</label>
+      </div>
+      <pre class="sql">SELECT 'Total de internações' AS titulo, TO_CHAR(COUNT(*)) AS valor FROM ADMIN.FATO_INTERNACAO_V2
+UNION ALL
+SELECT 'Hospitais atendendo', TO_CHAR(COUNT(DISTINCT id_hospital)) FROM ADMIN.FATO_INTERNACAO_V2
+UNION ALL
+SELECT 'Municípios atendidos', TO_CHAR(COUNT(DISTINCT codigo_municipio_paciente)) FROM ADMIN.FATO_INTERNACAO_V2
+UNION ALL
+SELECT 'Leitos totais', TO_CHAR(SUM(leitos_totais)) FROM ADMIN.DIM_HOSPITAL_V2 WHERE leitos_totais &lt; 500</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Internações por período <span class="tipo-regiao">Chart · Line</span></div>
+        <label class="check"><input type="checkbox" data-id="vg-linha"> feito</label>
+      </div>
+      <p class="explicacao">Label = <code>ANO_MES</code>, Value = <code>INTERNACOES</code>.</p>
+      <pre class="sql">SELECT t.ano_mes, COUNT(*) AS internacoes
+FROM ADMIN.FATO_INTERNACAO_V2 f
+JOIN ADMIN.DIM_TEMPO_V2 t ON t.tempo_id = f.tempo_id
+GROUP BY t.ano_mes
+ORDER BY t.ano_mes</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Ranking de municípios <span class="tipo-regiao">Chart · Bar</span></div>
+        <label class="check"><input type="checkbox" data-id="vg-municipios"> feito</label>
+      </div>
+      <pre class="sql">SELECT nome_municipio, SUM(total_internacoes) AS internacoes
+FROM ADMIN.VW_MUNICIPIO_INTERNACOES
+GROUP BY nome_municipio
+ORDER BY internacoes DESC
+FETCH FIRST 10 ROWS ONLY</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Top 10 diagnósticos <span class="tipo-regiao">Chart · Bar</span></div>
+        <label class="check"><input type="checkbox" data-id="vg-diagnosticos"> feito</label>
+      </div>
+      <p class="explicacao">
+        O APEX não tem treemap nativo como o Plotly — uma barra horizontal cobre o mesmo
+        recado (ranking), só sem a ideia de "proporção do todo".
+      </p>
+      <pre class="sql">SELECT descricao_cid, SUM(total_internacoes) AS internacoes
+FROM ADMIN.VW_DIAGNOSTICO_SIMPLES
+GROUP BY descricao_cid
+ORDER BY internacoes DESC
+FETCH FIRST 10 ROWS ONLY</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Pacientes que viajaram <span class="tipo-regiao">Chart · Pie</span></div>
+        <label class="check"><input type="checkbox" data-id="vg-viajou"> feito</label>
+      </div>
+      <p class="explicacao">Rode um <code>SELECT DISTINCT paciente_viajou FROM ADMIN.FATO_INTERNACAO_V2</code> antes, pra confirmar se os valores são texto (<code>'True'/'False'</code>) como no CSV local.</p>
+      <pre class="sql">SELECT paciente_viajou, COUNT(*) AS internacoes
+FROM ADMIN.FATO_INTERNACAO_V2
+GROUP BY paciente_viajou</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Mapa geográfico <span class="tipo-regiao">Map Region (Point Map) · opcional</span></div>
+        <label class="check"><input type="checkbox" data-id="vg-mapa"> feito</label>
+      </div>
+      <p class="explicacao">Mapeie <code>LATITUDE</code>/<code>LONGITUDE</code> como coordenadas e <code>INTERNACOES</code> como tamanho do ponto.</p>
+      <pre class="sql">SELECT m.nome_municipio, m.latitude, m.longitude, COUNT(*) AS internacoes
+FROM ADMIN.FATO_INTERNACAO_V2 f
+JOIN ADMIN.DIM_MUNICIPIO_V2 m ON m.codigo_municipio = f.codigo_municipio_paciente
+GROUP BY m.nome_municipio, m.latitude, m.longitude</pre>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Evolução mensal dos hospitais de maior volume <span class="tipo-regiao">opcional — simplificado</span></div>
+        <label class="check"><input type="checkbox" data-id="vg-evolucao"> feito</label>
+      </div>
+      <p class="explicacao">
+        O APEX não tem um equivalente direto ao gráfico animado do Plotly
+        (<code>animation_frame</code>). Em vez de tentar recriar a animação, mostre um
+        ranking simples do último mês — mais rápido de construir e comunica quase a mesma coisa:
+      </p>
+      <pre class="sql">SELECT f.id_hospital, f.nome_municipio_hospital, COUNT(*) AS internacoes
+FROM ADMIN.FATO_INTERNACAO_V2 f
+JOIN ADMIN.DIM_TEMPO_V2 t ON t.tempo_id = f.tempo_id
+WHERE t.ano_mes = (SELECT MAX(ano_mes) FROM ADMIN.DIM_TEMPO_V2)
+GROUP BY f.id_hospital, f.nome_municipio_hospital
+ORDER BY internacoes DESC
+FETCH FIRST 8 ROWS ONLY</pre>
+    </div>
+  </section>
+
+  <section class="pagina" id="pergunte">
+    <div class="pagina-titulo"><span class="numero">04</span><h2>Pergunte aos Dados</h2></div>
+    <p class="pagina-intro">
+      Essa é a parte mais legal de mostrar pro professor: o mesmo <code>DBMS_CLOUD_AI.GENERATE</code>
+      que o Streamlit chama em Python dá pra chamar direto de dentro de uma region do APEX —
+      sem nenhum código Python no meio. Deixe essa pra quando já estiver confortável com o
+      APEX (dia 3).
+    </p>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Campo de pergunta + botão <span class="tipo-regiao">Page Item + Button</span></div>
+        <label class="check"><input type="checkbox" data-id="pd-campo"> feito</label>
+      </div>
+      <p class="explicacao">
+        Crie um Page Item de texto chamado <code>P1_PERGUNTA</code> (Text Field) e um botão
+        "Perguntar" do tipo Submit.
+      </p>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Região de resultado com SQL dinâmico <span class="tipo-regiao">Interactive Report</span></div>
+        <label class="check"><input type="checkbox" data-id="pd-resultado"> feito</label>
+      </div>
+      <p class="explicacao">
+        Crie uma region "Interactive Report". Na aba <strong>Source → Location</strong>, escolha
+        <strong>"Function Body returning SQL Query"</strong> (não "Local Database" — é esse modo
+        especial que deixa o APEX executar uma query que só existe em tempo de execução). Cole:
+      </p>
+      <pre class="sql"><span class="c">-- Mesma logica do core/db.py do projeto Streamlit, so que em PL/SQL</span>
+DECLARE
+  l_sql CLOB;
+BEGIN
+  IF :P1_PERGUNTA IS NULL THEN
+    RETURN q'[SELECT 'Digite uma pergunta acima e clique em Perguntar' AS mensagem FROM dual]';
+  END IF;
+
+  l_sql := DBMS_CLOUD_AI.GENERATE(
+    prompt       => :P1_PERGUNTA,
+    profile_name => 'MEDDATA_PRECISAO',
+    action       => 'showsql'
+  );
+
+  <span class="c">-- remove cercas de markdown (```sql ... ```) e ; final, se vierem</span>
+  l_sql := REGEXP_REPLACE(l_sql, '```[[:alnum:]]*', '');
+  l_sql := RTRIM(TRIM(l_sql), ';');
+
+  RETURN l_sql;
+END;</pre>
+      <p class="mapeamento">
+        Depois, crie uma Dynamic Action no clique do botão: True Action = <strong>Refresh</strong>,
+        Selection Type = Region, Region = essa que você acabou de criar.
+      </p>
+    </div>
+
+    <div class="passo">
+      <div class="passo-head">
+        <div class="passo-titulo">Explicação em português (bônus) <span class="tipo-regiao">Display Item + Process</span></div>
+        <label class="check"><input type="checkbox" data-id="pd-explicacao"> feito</label>
+      </div>
+      <p class="explicacao">
+        Crie um item <code>P1_EXPLICACAO</code> (Display Only) e, na mesma Dynamic Action do
+        botão, adicione uma ação <strong>"Execute Server-side Code"</strong> antes do Refresh:
+      </p>
+      <pre class="sql">:P1_EXPLICACAO := DBMS_CLOUD_AI.GENERATE(
+  prompt       => :P1_PERGUNTA,
+  profile_name => 'MEDDATA_PRECISAO',
+  action       => 'chat'
+);</pre>
+      <p class="mapeamento">Marque <code>P1_EXPLICACAO</code> como "Page Items to Return" nessa ação, senão o valor não volta pra tela.</p>
+    </div>
+
+    <div class="aviso">
+      <strong>Mesmas limitações de sempre:</strong> o Select AI não é determinístico (a mesma
+      pergunta pode gerar SQL diferente em outra tentativa) e perguntas de distância/geolocalização
+      ainda são o ponto mais frágil. Isso já está documentado no relatório "Raio-X do MedData" —
+      vale citar pro professor que é uma limitação conhecida do modelo, não um bug escondido.
+    </div>
+  </section>
+
+  <section class="pagina" id="fora">
+    <div class="pagina-titulo"><span class="numero">05</span><h2>O que fica de fora (e por quê)</h2></div>
+    <p class="pagina-intro">
+      <strong>Chat MedData</strong> não migra pro APEX: ele depende de RAG em Python
+      (LangChain + ChromaDB + embeddings locais), e o APEX não roda Python. Pra existir lá
+      dentro, precisaria expor essa lógica como uma API externa chamada via REST — trabalho
+      grande demais pro prazo que você tem. Vale deixar isso explícito na apresentação: o Chat
+      continua só no Streamlit, por uma limitação técnica real do APEX, não por falta de tempo.
+    </p>
+  </section>
+
+  <section class="pagina" id="referencia">
+    <div class="pagina-titulo"><span class="numero">06</span><h2>Referência rápida das tabelas/views</h2></div>
+    <p class="pagina-intro">Confirmado direto no seu Autonomous Database — cole sem medo.</p>
+
+    <div class="ref-wrap">
+      <table class="ref">
+        <tr><th>Objeto</th><th>Uso neste guia</th><th>Colunas principais</th></tr>
+        <tr><td class="mono">FATO_INTERNACAO_V2</td><td>fato bruto</td><td class="mono">id_hospital, codigo_municipio_paciente, tempo_id, diagnostico_id, data_internacao, valor_procedimento, paciente_viajou</td></tr>
+        <tr><td class="mono">DIM_HOSPITAL_V2</td><td>hospitais</td><td class="mono">id_hospital, nome_municipio_hospital, leitos_totais, porte_hospitalar</td></tr>
+        <tr><td class="mono">DIM_MUNICIPIO_V2</td><td>municípios</td><td class="mono">codigo_municipio, nome_municipio, latitude, longitude</td></tr>
+        <tr><td class="mono">DIM_TEMPO_V2</td><td>calendário</td><td class="mono">tempo_id, data_referencia, ano_mes</td></tr>
+        <tr><td class="mono">VW_ALERTAS_COLAPSO</td><td>Monitoramento</td><td class="mono">id_hospital, nome_hospital, leitos_totais, leitos_ocupados, taxa_ocupacao, nivel_alerta</td></tr>
+        <tr><td class="mono">VW_MUNICIPIO_INTERNACOES</td><td>ranking municípios</td><td class="mono">nome_municipio, uf, ano, total_internacoes</td></tr>
+        <tr><td class="mono">VW_DIAGNOSTICO_SIMPLES</td><td>top diagnósticos</td><td class="mono">codigo_diagnostico, descricao_cid, ano, total_internacoes</td></tr>
+      </table>
+    </div>
+
+    <p style="color:var(--text-secondary); font-size:0.85rem; margin-top:1rem;">
+      O banco também tem <code>VW_CRESCIMENTO_MUNICIPIO</code>, <code>VW_OCUPACAO_DIARIA</code>,
+      <code>VW_PACIENTES_VIAJANTES</code>, <code>VW_PERMANENCIA_MEDIA</code>,
+      <code>VW_PRESSAO_ASSISTENCIAL</code> e <code>VW_ROTATIVIDADE_LEITOS</code> — não usadas
+      neste guia por não terem equivalente direto no Streamlit atual, mas prontas se sobrar
+      tempo e você quiser um gráfico extra pra impressionar.
+    </p>
+  </section>
+
+  <div class="rodape">
+    MedData · Challenge Oracle 2026 — guia de apoio, não substitui testar tudo com calma antes de apresentar.
+  </div>
+</div>
+
+<script>
+(function () {
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-id]'));
+  var KEY = 'meddata-apex-progresso';
+  var salvo = {};
+  try { salvo = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+
+  function atualizarBarra() {
+    var marcados = boxes.filter(function (b) { return b.checked; }).length;
+    var pct = boxes.length ? Math.round((marcados / boxes.length) * 100) : 0;
+    document.getElementById('barra-fill').style.width = pct + '%';
+    document.getElementById('progresso-texto').textContent = marcados + ' de ' + boxes.length + ' passos marcados';
+  }
+
+  boxes.forEach(function (b) {
+    if (salvo[b.dataset.id]) b.checked = true;
+    b.addEventListener('change', function () {
+      try {
+        salvo[b.dataset.id] = b.checked;
+        localStorage.setItem(KEY, JSON.stringify(salvo));
+      } catch (e) {}
+      atualizarBarra();
+    });
+  });
+
+  window.addEventListener('scroll', function () {
+    document.getElementById('progresso').classList.toggle('colado', window.scrollY > 20);
+  });
+
+  atualizarBarra();
+})();
+</script>

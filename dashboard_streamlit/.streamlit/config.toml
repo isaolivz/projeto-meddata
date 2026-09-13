@@ -1,0 +1,8 @@
+# Tema visual do MedData: paleta clara "editorial serio" (ver core/tema_editorial.py).
+[theme]
+base = "light"
+primaryColor = "#0F6B72"
+backgroundColor = "#F4F8FC"
+secondaryBackgroundColor = "#3E6E79"
+textColor = "#111827"
+font = "sans serif"

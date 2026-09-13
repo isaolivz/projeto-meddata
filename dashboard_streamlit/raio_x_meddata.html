@@ -1,0 +1,583 @@
+<!doctype html>
+<title>Raio-X do MedData</title>
+<style>
+  :root {
+    --bg: #F6F8FA;
+    --surface: #FFFFFF;
+    --surface-soft: #EEF2F5;
+    --ink: #0F172A;
+    --ink-soft: #4B5768;
+    --ink-faint: #7C8B9C;
+    --border: #DCE3E8;
+    --accent: #0F6B72;
+    --accent-soft: #E4F0EF;
+    --critical: #B0413E;
+    --critical-soft: #F7E8E7;
+    --warning: #8A6414;
+    --warning-soft: #F6EDDC;
+    --serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0B1420;
+      --surface: #131F30;
+      --surface-soft: #1B2A3D;
+      --ink: #E7EDF3;
+      --ink-soft: #9AACBE;
+      --ink-faint: #6B7E92;
+      --border: #24374C;
+      --accent: #3FA6AC;
+      --accent-soft: #17323330;
+      --critical: #E1867E;
+      --critical-soft: #3A2321;
+      --warning: #D9AE5D;
+      --warning-soft: #3A2F17;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0B1420;
+    --surface: #131F30;
+    --surface-soft: #1B2A3D;
+    --ink: #E7EDF3;
+    --ink-soft: #9AACBE;
+    --ink-faint: #6B7E92;
+    --border: #24374C;
+    --accent: #3FA6AC;
+    --accent-soft: #17323330;
+    --critical: #E1867E;
+    --critical-soft: #3A2321;
+    --warning: #D9AE5D;
+    --warning-soft: #3A2F17;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 28px 96px;
+  }
+
+  /* ---------- Header ---------- */
+  header.hero {
+    padding: 56px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .eyebrow .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.2vw, 3rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+
+  .dek {
+    font-size: 1.08rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0 0 26px;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--ink-soft);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    padding: 5px 10px;
+    border-radius: 4px;
+  }
+
+  /* ---------- Section scaffolding ---------- */
+  section { margin: 64px 0; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .section-note {
+    color: var(--ink-soft);
+    max-width: 68ch;
+    margin: 14px 0 28px;
+  }
+
+  p { max-width: 68ch; }
+
+  /* ---------- MVP grid ---------- */
+  .mvp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .mvp-item {
+    background: var(--surface);
+    padding: 20px 22px;
+  }
+
+  .mvp-item .k {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .mvp-item .t {
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .mvp-item .d {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Stack list ---------- */
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .stack-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 14px;
+  }
+
+  .stack-item .name {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .stack-item .role {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- Finding cards (bugs / limitations) ---------- */
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 6px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+
+  .finding.resolved { border-left-color: var(--accent); }
+  .finding.open { border-left-color: var(--warning); }
+
+  .finding-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .finding-title {
+    font-weight: 600;
+    font-size: 1.02rem;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .pill.resolved { background: var(--accent-soft); color: var(--accent); }
+  .pill.open { background: var(--warning-soft); color: var(--warning); }
+
+  .finding-body {
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+  }
+
+  .evidence {
+    font-family: var(--mono);
+    font-size: 0.84rem;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 12px 16px;
+    margin: 14px 0;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .evidence .before { color: var(--critical); }
+  .evidence .after { color: var(--accent); }
+  .evidence .arrow { color: var(--ink-faint); padding: 0 8px; }
+
+  /* ---------- Roadmap ---------- */
+  .roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .road-item {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 18px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .road-item:last-child { border-bottom: none; }
+
+  .road-num {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    color: var(--ink-faint);
+  }
+
+  .road-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .road-body {
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--ink-faint);
+    font-size: 0.84rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  footer .mono { font-family: var(--mono); }
+
+  @media (max-width: 560px) {
+    header.hero { padding: 40px 0 30px; }
+    .wrap { padding: 0 18px 72px; }
+    .road-item { grid-template-columns: 28px 1fr; }
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow"><span class="dot"></span>Challenge Oracle 2026 &middot; Relatório de projeto</div>
+    <h1>Raio-X do MedData</h1>
+    <p class="dek">Um painel de monitoramento de ocupação hospitalar do SUS (São Paulo) com IA generativa como
+      interface de consulta. Este documento registra, com números reais, o que o MVP entrega, os bugs que
+      encontramos e corrigimos ao longo do desenvolvimento, e as limitações que decidimos documentar em vez
+      de esconder.</p>
+    <div class="tags">
+      <span class="tag">Streamlit</span>
+      <span class="tag">Oracle ADB</span>
+      <span class="tag">Select AI / Cohere</span>
+      <span class="tag">LangChain + ChromaDB</span>
+      <span class="tag">Pandas / Plotly</span>
+    </div>
+  </header>
+
+  <section id="mvp">
+    <div class="section-head"><span class="section-num">01</span><h2>O que o MVP entrega</h2></div>
+    <p class="section-note">Cinco frentes, cada uma com um propósito só: mostrar volume, mostrar risco,
+      responder pergunta direta, conversar com recomendação, e explorar previsão de curto prazo.</p>
+
+    <div class="mvp-grid">
+      <div class="mvp-item">
+        <span class="k">Página</span>
+        <div class="t">Visão Geral</div>
+        <div class="d">Volume de internações, diagnósticos (CID), distribuição geográfica e evolução mensal —
+          contexto, não risco.</div>
+      </div>
+      <div class="mvp-item">
+        <span class="k">Página</span>
+        <div class="t">Monitoramento</div>
+        <div class="d">Alertas críticos, ranking de risco por hospital e ocupação agregada da rede — o núcleo
+          da tese do projeto.</div>
+      </div>
+      <div class="mvp-item">
+        <span class="k">Página</span>
+        <div class="t">Pergunte aos Dados</div>
+        <div class="d">Perguntas diretas em português, respondidas via Select AI contra o schema real do
+          Oracle ADB.</div>
+      </div>
+      <div class="mvp-item">
+        <span class="k">Página</span>
+        <div class="t">Chat MedData</div>
+        <div class="d">Mesmo motor, com roteamento por IA e uma base de conhecimento (RAG) que orienta
+          recomendações.</div>
+      </div>
+      <div class="mvp-item">
+        <span class="k">Protótipo</span>
+        <div class="t">Novo design visual</div>
+        <div class="d">Linguagem visual editorial (paleta restrita, linhas finas) testada lado a lado com o
+          design atual, sem risco para o app principal.</div>
+      </div>
+      <div class="mvp-item">
+        <span class="k">Exploração</span>
+        <div class="t">Painel preditivo</div>
+        <div class="d">Notebook com forecast de curto prazo (Holt-Winters), validado com MAPE — ainda não
+          integrado ao app.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stack">
+    <div class="section-head"><span class="section-num">02</span><h2>Tecnologias</h2></div>
+    <p class="section-note">Cada peça foi escolhida pelo que resolve, não pela moda — o motor de consulta é
+      nativo do Oracle (o desafio é da Oracle); o RAG é LangChain porque é onde ele realmente agrega valor
+      (conhecimento de domínio), não em tudo.</p>
+    <div class="stack">
+      <div class="stack-item"><span class="name">Streamlit</span><span class="role">interface</span></div>
+      <div class="stack-item"><span class="name">Oracle ADB</span><span class="role">banco de dados</span></div>
+      <div class="stack-item"><span class="name">Select AI</span><span class="role">texto → SQL</span></div>
+      <div class="stack-item"><span class="name">Cohere</span><span class="role">modelo de linguagem</span></div>
+      <div class="stack-item"><span class="name">LangChain + ChromaDB</span><span class="role">RAG</span></div>
+      <div class="stack-item"><span class="name">sentence-transformers</span><span class="role">embeddings locais</span></div>
+      <div class="stack-item"><span class="name">Pandas</span><span class="role">agregação</span></div>
+      <div class="stack-item"><span class="name">Plotly</span><span class="role">visualização</span></div>
+      <div class="stack-item"><span class="name">statsmodels</span><span class="role">forecast (ETS)</span></div>
+    </div>
+  </section>
+
+  <section id="bugs">
+    <div class="section-head"><span class="section-num">03</span><h2>Bugs reais, encontrados e corrigidos</h2></div>
+    <p class="section-note">Cada um destes foi reproduzido com uma consulta real contra o banco antes de ser
+      considerado corrigido — nenhuma correção foi assumida sem reteste.</p>
+
+    <div class="finding resolved">
+      <div class="finding-head">
+        <span class="finding-title">Leitos ~11,5&times; inflados na tabela de hospitais</span>
+        <span class="pill resolved">Corrigido na origem</span>
+      </div>
+      <div class="finding-body">A coluna <code>leitos_totais</code> da versão atualizada dos dados tinha um
+        problema de geração. Corrigido via <code>UPDATE</code> direto na tabela, usando o valor real da
+        geração anterior (casado pelo código CNES), para 1.404 dos 1.466 hospitais.</div>
+      <div class="evidence">média V2: <span class="before">926,9 leitos</span><span class="arrow">devia ser</span><span class="after">80,8 leitos</span> (média V1, real)</div>
+      <div class="evidence">total em São Paulo: <span class="before">1.358.903</span><span class="arrow">&rarr;</span><span class="after">39.848</span> leitos, após a correção</div>
+    </div>
+
+    <div class="finding resolved">
+      <div class="finding-head">
+        <span class="finding-title">Persona do agente confundindo a geração de SQL</span>
+        <span class="pill resolved">Corrigido</span>
+      </div>
+      <div class="finding-body">O parágrafo de contexto do agente ("Você é um agente de Capacidade...")
+        entrava no mesmo texto da pergunta usado para gerar SQL. Corrigido separando os dois: a pergunta vai
+        pura para a geração de SQL, o contexto só entra na explicação final.</div>
+      <div class="evidence">"Quantas internações ocorreram no total?" sozinha: <span class="after">671.860</span> (correto)</div>
+      <div class="evidence">mesma pergunta com o parágrafo de contexto na frente: <span class="before">10.048.284</span> (somou dias de internação, não contou internações)</div>
+    </div>
+
+    <div class="finding resolved">
+      <div class="finding-head">
+        <span class="finding-title">IA tentando usar funções que não existem no Oracle</span>
+        <span class="pill resolved">Mitigado via RAG</span>
+      </div>
+      <div class="finding-body">Para calcular distância entre coordenadas, o modelo gerava SQL com
+        <code>PI()</code> e <code>SDO_GEOM.SDO_DISTANCE</code> — nenhuma das duas existe neste banco (não há
+        metadado espacial cadastrado, e o Oracle não tem função <code>PI()</code>). Corrigido fornecendo uma
+        fórmula pronta (lei dos cossenos esférica com <code>RADIANS()</code>) na base de conhecimento.</div>
+      <div class="evidence"><span class="before">ORA-00904: "PI": invalid identifier</span> — consulta inteira rejeitada</div>
+    </div>
+
+    <div class="finding resolved">
+      <div class="finding-head">
+        <span class="finding-title">Mesma pergunta, número diferente — view errada</span>
+        <span class="pill resolved">Mitigado via RAG</span>
+      </div>
+      <div class="finding-body">Duas views de nome parecido cobrem períodos diferentes. Uma delas soma só os
+        últimos 12 meses; a IA às vezes a escolhia para perguntas sobre o total histórico, sem avisar a
+        limitação. Documentamos o escopo exato de cada view na base de conhecimento.</div>
+      <div class="evidence">"total geral de internações": <span class="after">671.860</span> (view sem filtro de tempo) <span class="arrow">vs.</span> <span class="before">632.233</span> (view de 12 meses, usada por engano)</div>
+    </div>
+
+    <div class="finding resolved">
+      <div class="finding-head">
+        <span class="finding-title">Borda de extração de dados parecendo uma queda real</span>
+        <span class="pill resolved">Identificado e corrigido</span>
+      </div>
+      <div class="finding-body">Os últimos dias disponíveis na base têm contagem artificialmente baixa —
+        a extração dos dados aconteceu no meio do processamento do último mês, não porque as internações
+        caíram de verdade. Sem tratar isso, um modelo de previsão confunde com tendência de queda real e
+        projeta valores negativos.</div>
+      <div class="evidence">últimos dias: 1.031 &rarr; 739 &rarr; 326 &rarr; <span class="before">63</span> internações/dia</div>
+      <div class="evidence">erro do modelo de previsão (MAPE): <span class="before">147,7%</span><span class="arrow">&rarr;</span><span class="after">22,4%</span>, após excluir a borda</div>
+    </div>
+  </section>
+
+  <section id="limitacoes">
+    <div class="section-head"><span class="section-num">04</span><h2>Limitações que decidimos documentar</h2></div>
+    <p class="section-note">Estas não têm correção definitiva com o que temos hoje — preferimos deixar
+      explícito o limite a fingir que não existe.</p>
+
+    <div class="finding open">
+      <div class="finding-head">
+        <span class="finding-title">Select AI é não-determinístico</span>
+        <span class="pill open">Conhecida</span>
+      </div>
+      <div class="finding-body">A mesma pergunta, feita duas vezes, pode gerar SQL diferente — e portanto
+        resposta diferente. As correções acima reduzem a frequência disso, mas não eliminam: é uma
+        característica do modelo, não um bug pontual.</div>
+    </div>
+
+    <div class="finding open">
+      <div class="finding-head">
+        <span class="finding-title">Perguntas de distância continuam frágeis</span>
+        <span class="pill open">Conhecida</span>
+      </div>
+      <div class="finding-body">Mesmo com a fórmula certa disponível na base de conhecimento, o modelo às
+        vezes ainda tenta <code>SDO_GEOM</code> de novo, ou usa uma coordenada de referência errada. É o
+        ponto mais frágil do sistema hoje.</div>
+    </div>
+
+    <div class="finding open">
+      <div class="finding-head">
+        <span class="finding-title">Respostas não sinalizam nível de confiança</span>
+        <span class="pill open">Conhecida</span>
+      </div>
+      <div class="finding-body">Uma resposta certa e uma resposta duvidosa saem com o mesmo tom de segurança
+        — não há hoje um sinal visual de "isso é exato" vs. "isso é uma estimativa".</div>
+    </div>
+
+    <div class="finding open">
+      <div class="finding-head">
+        <span class="finding-title">Índice composto de risco (MDS) adiado</span>
+        <span class="pill open">Bloqueado por dado externo</span>
+      </div>
+      <div class="finding-body">Depende de população por município (IBGE), que ainda não temos. Decidimos
+        não implementar com um substituto improvisado — fica para quando o dado real chegar.</div>
+    </div>
+  </section>
+
+  <section id="roadmap">
+    <div class="section-head"><span class="section-num">05</span><h2>Próximos passos</h2></div>
+    <p class="section-note">Em ordem de prioridade — o primeiro item ataca diretamente a limitação mais
+      séria da lista acima.</p>
+
+    <div class="roadmap">
+      <div class="road-item">
+        <span class="road-num">1</span>
+        <div>
+          <div class="road-title">Separar entendimento de execução</div>
+          <div class="road-body">Para perguntas conhecidas (ranking de risco, hospital mais próximo com
+            vaga), usar uma consulta pronta e testada em vez de deixar a IA reescrever o SQL toda vez —
+            elimina a classe inteira de bug de fórmula errada para esses casos.</div>
+        </div>
+      </div>
+      <div class="road-item">
+        <span class="road-num">2</span>
+        <div>
+          <div class="road-title">Validar o painel preditivo com mais dado</div>
+          <div class="road-body">O notebook já mostra MAPE de 22,4% num teste — rodar de novo conforme mais
+            meses de dado ficarem disponíveis, antes de expor isso como página do dashboard.</div>
+        </div>
+      </div>
+      <div class="road-item">
+        <span class="road-num">3</span>
+        <div>
+          <div class="road-title">Implementar o MDS com dado real de população</div>
+          <div class="road-body">Assim que tivermos população por município (IBGE), retomar o índice
+            composto que ficou pausado por falta desse dado.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>MedData &middot; Challenge Oracle 2026</span>
+    <span class="mono">documento vivo &mdash; atualizado conforme o projeto avança</span>
+  </footer>
+
+</div>

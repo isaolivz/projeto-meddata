@@ -1,0 +1,646 @@
+﻿codigo_municipio;nome_municipio;uf;estado;latitude;longitude
+350010;Adamantina;SP;Sao Paulo;-21,682;-51,0737
+350020;Adolfo;SP;Sao Paulo;-21,2325;-49,6451
+350030;Aguaí;SP;Sao Paulo;-22,0572;-46,9735
+350040;Águas da Prata;SP;Sao Paulo;-21,9319;-46,7176
+350050;Águas de Lindóia;SP;Sao Paulo;-22,4733;-46,6314
+350055;Águas de Santa Bárbara;SP;Sao Paulo;-22,8812;-49,2421
+350060;Águas de São Pedro;SP;Sao Paulo;-22,5977;-47,8734
+350070;Agudos;SP;Sao Paulo;-22,4694;-48,9863
+350075;Alambari;SP;Sao Paulo;-23,5503;-47,898
+350080;Alfredo Marcondes;SP;Sao Paulo;-21,9527;-51,414
+350090;Altair;SP;Sao Paulo;-20,5242;-49,0571
+350100;Altinópolis;SP;Sao Paulo;-21,0214;-47,3712
+350110;Alto Alegre;SP;Sao Paulo;-21,5811;-50,168
+350115;Alumínio;SP;Sao Paulo;-23,5306;-47,2546
+350120;Álvares Florence;SP;Sao Paulo;-20,3203;-49,9141
+350130;Álvares Machado;SP;Sao Paulo;-22,0764;-51,4722
+350140;Álvaro de Carvalho;SP;Sao Paulo;-22,0841;-49,719
+350150;Alvinlândia;SP;Sao Paulo;-22,4435;-49,7623
+350160;Americana;SP;Sao Paulo;-22,7374;-47,3331
+350170;Américo Brasiliense;SP;Sao Paulo;-21,7288;-48,1147
+350180;Américo de Campos;SP;Sao Paulo;-20,2985;-49,7359
+350190;Amparo;SP;Sao Paulo;-22,7088;-46,772
+350200;Analândia;SP;Sao Paulo;-22,1289;-47,6619
+350210;Andradina;SP;Sao Paulo;-20,8948;-51,3786
+350220;Angatuba;SP;Sao Paulo;-23,4917;-48,4139
+350230;Anhembi;SP;Sao Paulo;-22,793;-48,1336
+350240;Anhumas;SP;Sao Paulo;-22,2934;-51,3895
+350250;Aparecida;SP;Sao Paulo;-22,8495;-45,2325
+350260;Aparecida d'Oeste;SP;Sao Paulo;-20,4487;-50,8835
+350270;Apiaí;SP;Sao Paulo;-24,5108;-48,8443
+350275;Araçariguama;SP;Sao Paulo;-23,4366;-47,0608
+350280;Araçatuba;SP;Sao Paulo;-21,2076;-50,4401
+350290;Araçoiaba da Serra;SP;Sao Paulo;-23,5029;-47,6166
+350300;Aramina;SP;Sao Paulo;-20,0882;-47,7873
+350310;Arandu;SP;Sao Paulo;-23,1386;-49,0487
+350315;Arapeí;SP;Sao Paulo;-22,6717;-44,4441
+350320;Araraquara;SP;Sao Paulo;-21,7845;-48,178
+350330;Araras;SP;Sao Paulo;-22,3572;-47,3842
+350335;Arco-Íris;SP;Sao Paulo;-21,7728;-50,466
+350340;Arealva;SP;Sao Paulo;-22,031;-48,9135
+350350;Areias;SP;Sao Paulo;-22,5786;-44,6992
+350360;Areiópolis;SP;Sao Paulo;-22,6672;-48,6681
+350370;Ariranha;SP;Sao Paulo;-21,1872;-48,7904
+350380;Artur Nogueira;SP;Sao Paulo;-22,5727;-47,1727
+350390;Arujá;SP;Sao Paulo;-23,3965;-46,32
+350395;Aspásia;SP;Sao Paulo;-20,16;-50,728
+350400;Assis;SP;Sao Paulo;-22,66;-50,4183
+350410;Atibaia;SP;Sao Paulo;-23,1171;-46,5563
+350420;Auriflama;SP;Sao Paulo;-20,6836;-50,5572
+350430;Avaí;SP;Sao Paulo;-22,1514;-49,3356
+350440;Avanhandava;SP;Sao Paulo;-21,4584;-49,9509
+350450;Avaré;SP;Sao Paulo;-23,1067;-48,9251
+350460;Bady Bassitt;SP;Sao Paulo;-20,9197;-49,4385
+350470;Balbinos;SP;Sao Paulo;-21,8963;-49,3619
+350480;Bálsamo;SP;Sao Paulo;-20,7348;-49,5865
+350490;Bananal;SP;Sao Paulo;-22,6819;-44,3281
+350500;Barão de Antonina;SP;Sao Paulo;-23,6284;-49,5634
+350510;Barbosa;SP;Sao Paulo;-21,2657;-49,9518
+350520;Bariri;SP;Sao Paulo;-22,073;-48,7438
+350530;Barra Bonita;SP;Sao Paulo;-22,4909;-48,5583
+350535;Barra do Chapéu;SP;Sao Paulo;-24,4722;-49,0238
+350540;Barra do Turvo;SP;Sao Paulo;-24,759;-48,5013
+350550;Barretos;SP;Sao Paulo;-20,5531;-48,5698
+350560;Barrinha;SP;Sao Paulo;-21,1864;-48,1636
+350570;Barueri;SP;Sao Paulo;-23,5057;-46,879
+350580;Bastos;SP;Sao Paulo;-21,921;-50,7357
+350590;Batatais;SP;Sao Paulo;-20,8929;-47,5921
+350600;Bauru;SP;Sao Paulo;-22,3246;-49,0871
+350610;Bebedouro;SP;Sao Paulo;-20,9491;-48,4791
+350620;Bento de Abreu;SP;Sao Paulo;-21,2686;-50,814
+350630;Bernardino de Campos;SP;Sao Paulo;-23,0164;-49,4679
+350635;Bertioga;SP;Sao Paulo;-23,8486;-46,1396
+350640;Bilac;SP;Sao Paulo;-21,404;-50,4746
+350650;Birigui;SP;Sao Paulo;-21,291;-50,3432
+350660;Biritiba-Mirim;SP;Sao Paulo;-23,5698;-46,0407
+350670;Boa Esperança do Sul;SP;Sao Paulo;-21,9918;-48,3906
+350680;Bocaina;SP;Sao Paulo;-22,1365;-48,523
+350690;Bofete;SP;Sao Paulo;-23,1055;-48,2582
+350700;Boituva;SP;Sao Paulo;-23,2855;-47,6786
+350710;Bom Jesus dos Perdões;SP;Sao Paulo;-23,1356;-46,4675
+350715;Bom Sucesso de Itararé;SP;Sao Paulo;-24,3155;-49,1451
+350720;Borá;SP;Sao Paulo;-22,2696;-50,5409
+350730;Boracéia;SP;Sao Paulo;-22,1926;-48,7808
+350740;Borborema;SP;Sao Paulo;-21,6214;-49,0741
+350745;Borebi;SP;Sao Paulo;-22,5728;-48,9707
+350750;Botucatu;SP;Sao Paulo;-22,8837;-48,4437
+350760;Bragança Paulista;SP;Sao Paulo;-22,9527;-46,5419
+350770;Braúna;SP;Sao Paulo;-21,499;-50,3175
+350775;Brejo Alegre;SP;Sao Paulo;-21,1651;-50,1861
+350780;Brodowski;SP;Sao Paulo;-20,9845;-47,6572
+350790;Brotas;SP;Sao Paulo;-22,2795;-48,1251
+350800;Buri;SP;Sao Paulo;-23,7977;-48,5958
+350810;Buritama;SP;Sao Paulo;-21,0661;-50,1475
+350820;Buritizal;SP;Sao Paulo;-20,1911;-47,7096
+350830;Cabrália Paulista;SP;Sao Paulo;-22,4576;-49,3393
+350840;Cabreúva;SP;Sao Paulo;-23,3053;-47,1362
+350850;Caçapava;SP;Sao Paulo;-23,0992;-45,7076
+350860;Cachoeira Paulista;SP;Sao Paulo;-22,6665;-45,0154
+350870;Caconde;SP;Sao Paulo;-21,528;-46,6437
+350880;Cafelândia;SP;Sao Paulo;-21,8031;-49,6092
+350890;Caiabu;SP;Sao Paulo;-22,0127;-51,2394
+350900;Caieiras;SP;Sao Paulo;-23,3607;-46,7397
+350910;Caiuá;SP;Sao Paulo;-21,8322;-51,9969
+350920;Cajamar;SP;Sao Paulo;-23,355;-46,8781
+350925;Cajati;SP;Sao Paulo;-24,7324;-48,1223
+350930;Cajobi;SP;Sao Paulo;-20,8773;-48,8063
+350940;Cajuru;SP;Sao Paulo;-21,2749;-47,303
+350945;Campina do Monte Alegre;SP;Sao Paulo;-23,5895;-48,4758
+350950;Campinas;SP;Sao Paulo;-22,9053;-47,0659
+350960;Campo Limpo Paulista;SP;Sao Paulo;-23,2078;-46,7889
+350970;Campos do Jordão;SP;Sao Paulo;-22,7296;-45,5833
+350980;Campos Novos Paulista;SP;Sao Paulo;-22,602;-49,9987
+350990;Cananéia;SP;Sao Paulo;-25,0144;-47,9341
+350995;Canas;SP;Sao Paulo;-22,7003;-45,0521
+351000;Cândido Mota;SP;Sao Paulo;-22,7471;-50,3873
+351010;Cândido Rodrigues;SP;Sao Paulo;-21,3275;-48,6327
+351015;Canitar;SP;Sao Paulo;-23,004;-49,7839
+351020;Capão Bonito;SP;Sao Paulo;-24,0113;-48,3482
+351030;Capela do Alto;SP;Sao Paulo;-23,4685;-47,7388
+351040;Capivari;SP;Sao Paulo;-22,9951;-47,5071
+351050;Caraguatatuba;SP;Sao Paulo;-23,6125;-45,4125
+351060;Carapicuíba;SP;Sao Paulo;-23,5235;-46,8407
+351070;Cardoso;SP;Sao Paulo;-20,08;-49,9183
+351080;Casa Branca;SP;Sao Paulo;-21,7708;-47,0852
+351090;Cássia dos Coqueiros;SP;Sao Paulo;-21,2801;-47,1643
+351100;Castilho;SP;Sao Paulo;-20,8689;-51,4884
+351110;Catanduva;SP;Sao Paulo;-21,1314;-48,977
+351120;Catiguá;SP;Sao Paulo;-21,0519;-49,0616
+351130;Cedral;SP;Sao Paulo;-20,9009;-49,2664
+351140;Cerqueira César;SP;Sao Paulo;-23,038;-49,1655
+351150;Cerquilho;SP;Sao Paulo;-23,1665;-47,7459
+351160;Cesário Lange;SP;Sao Paulo;-23,226;-47,9545
+351170;Charqueada;SP;Sao Paulo;-22,5096;-47,7755
+355720;Chavantes;SP;Sao Paulo;-23,0366;-49,7096
+351190;Clementina;SP;Sao Paulo;-21,5604;-50,4525
+351200;Colina;SP;Sao Paulo;-20,7114;-48,5387
+351210;Colômbia;SP;Sao Paulo;-20,1768;-48,6865
+351220;Conchal;SP;Sao Paulo;-22,3375;-47,1729
+351230;Conchas;SP;Sao Paulo;-23,0154;-48,0134
+351240;Cordeirópolis;SP;Sao Paulo;-22,4778;-47,4519
+351250;Coroados;SP;Sao Paulo;-21,3521;-50,2859
+351260;Coronel Macedo;SP;Sao Paulo;-23,6261;-49,31
+351270;Corumbataí;SP;Sao Paulo;-22,2213;-47,6215
+351280;Cosmópolis;SP;Sao Paulo;-22,6419;-47,1926
+351290;Cosmorama;SP;Sao Paulo;-20,4755;-49,7827
+351300;Cotia;SP;Sao Paulo;-23,6022;-46,919
+351310;Cravinhos;SP;Sao Paulo;-21,338;-47,7324
+351320;Cristais Paulista;SP;Sao Paulo;-20,4036;-47,4209
+351330;Cruzália;SP;Sao Paulo;-22,7373;-50,7909
+351340;Cruzeiro;SP;Sao Paulo;-22,5728;-44,969
+351350;Cubatão;SP;Sao Paulo;-23,8911;-46,424
+351360;Cunha;SP;Sao Paulo;-23,0731;-44,9576
+351370;Descalvado;SP;Sao Paulo;-21,9002;-47,6181
+351380;Diadema;SP;Sao Paulo;-23,6813;-46,6205
+351385;Dirce Reis;SP;Sao Paulo;-20,4642;-50,6073
+351390;Divinolândia;SP;Sao Paulo;-21,6637;-46,7361
+351400;Dobrada;SP;Sao Paulo;-21,5155;-48,3935
+351410;Dois Córregos;SP;Sao Paulo;-22,3673;-48,3819
+351420;Dolcinópolis;SP;Sao Paulo;-20,124;-50,5149
+351430;Dourado;SP;Sao Paulo;-22,1044;-48,3178
+351440;Dracena;SP;Sao Paulo;-21,4843;-51,535
+351450;Duartina;SP;Sao Paulo;-22,4146;-49,4084
+351460;Dumont;SP;Sao Paulo;-21,2324;-47,9756
+351470;Echaporã;SP;Sao Paulo;-22,4326;-50,2038
+351480;Eldorado;SP;Sao Paulo;-24,5281;-48,1141
+351490;Elias Fausto;SP;Sao Paulo;-23,0428;-47,3682
+351492;Elisiário;SP;Sao Paulo;-21,1678;-49,1146
+351495;Embaúba;SP;Sao Paulo;-20,9796;-48,8325
+351500;Embu das Artes;SP;Sao Paulo;-23,6437;-46,8579
+351510;Embu-Guaçu;SP;Sao Paulo;-23,8297;-46,8136
+351512;Emilianópolis;SP;Sao Paulo;-21,8314;-51,4832
+351515;Engenheiro Coelho;SP;Sao Paulo;-22,4836;-47,211
+351518;Espírito Santo do Pinhal;SP;Sao Paulo;-22,1909;-46,7477
+351519;Espírito Santo do Turvo;SP;Sao Paulo;-22,6925;-49,4341
+355730;Estiva Gerbi;SP;Sao Paulo;-22,2713;-46,9481
+351520;Estrela d'Oeste;SP;Sao Paulo;-20,2875;-50,4049
+351530;Estrela do Norte;SP;Sao Paulo;-22,4859;-51,6632
+351535;Euclides da Cunha Paulista;SP;Sao Paulo;-22,5545;-52,5928
+351540;Fartura;SP;Sao Paulo;-23,3916;-49,5124
+351560;Fernando Prestes;SP;Sao Paulo;-21,2661;-48,6874
+351550;Fernandópolis;SP;Sao Paulo;-20,2806;-50,2471
+351565;Fernão;SP;Sao Paulo;-22,3607;-49,5187
+351570;Ferraz de Vasconcelos;SP;Sao Paulo;-23,5411;-46,371
+351580;Flora Rica;SP;Sao Paulo;-21,6727;-51,3821
+351590;Floreal;SP;Sao Paulo;-20,6752;-50,1513
+351600;Flórida Paulista;SP;Sao Paulo;-21,6127;-51,1724
+351610;Florínia;SP;Sao Paulo;-22,868;-50,6814
+351620;Franca;SP;Sao Paulo;-20,5352;-47,4039
+351630;Francisco Morato;SP;Sao Paulo;-23,2792;-46,7448
+351640;Franco da Rocha;SP;Sao Paulo;-23,3229;-46,729
+351650;Gabriel Monteiro;SP;Sao Paulo;-21,5294;-50,5573
+351660;Gália;SP;Sao Paulo;-22,2918;-49,5504
+351670;Garça;SP;Sao Paulo;-22,2125;-49,6546
+351680;Gastão Vidigal;SP;Sao Paulo;-20,7948;-50,1912
+351685;Gavião Peixoto;SP;Sao Paulo;-21,8367;-48,4957
+351690;General Salgado;SP;Sao Paulo;-20,6485;-50,364
+351700;Getulina;SP;Sao Paulo;-21,7961;-49,9312
+351710;Glicério;SP;Sao Paulo;-21,3812;-50,2123
+351720;Guaiçara;SP;Sao Paulo;-21,6195;-49,8013
+351730;Guaimbê;SP;Sao Paulo;-21,9091;-49,8986
+351740;Guaíra;SP;Sao Paulo;-20,3196;-48,312
+351750;Guapiaçu;SP;Sao Paulo;-20,7959;-49,2172
+351760;Guapiara;SP;Sao Paulo;-24,1892;-48,5295
+351770;Guará;SP;Sao Paulo;-20,4302;-47,8236
+351780;Guaraçaí;SP;Sao Paulo;-21,0292;-51,2119
+351790;Guaraci;SP;Sao Paulo;-20,4977;-48,9391
+351800;Guarani d'Oeste;SP;Sao Paulo;-20,0746;-50,3411
+351810;Guarantã;SP;Sao Paulo;-21,8942;-49,5914
+351820;Guararapes;SP;Sao Paulo;-21,2544;-50,6453
+351830;Guararema;SP;Sao Paulo;-23,4112;-46,0369
+351840;Guaratinguetá;SP;Sao Paulo;-22,8075;-45,1938
+351850;Guareí;SP;Sao Paulo;-23,3714;-48,1837
+351860;Guariba;SP;Sao Paulo;-21,3594;-48,2316
+351870;Guarujá;SP;Sao Paulo;-23,9888;-46,258
+351880;Guarulhos;SP;Sao Paulo;-23,4538;-46,5333
+351885;Guatapará;SP;Sao Paulo;-21,4944;-48,0356
+351890;Guzolândia;SP;Sao Paulo;-20,6467;-50,6645
+351900;Herculândia;SP;Sao Paulo;-22,0038;-50,3907
+351905;Holambra;SP;Sao Paulo;-22,6405;-47,0487
+351907;Hortolândia;SP;Sao Paulo;-22,8529;-47,2143
+351910;Iacanga;SP;Sao Paulo;-21,8896;-49,031
+351920;Iacri;SP;Sao Paulo;-21,8572;-50,6932
+351925;Iaras;SP;Sao Paulo;-22,8682;-49,1634
+351930;Ibaté;SP;Sao Paulo;-21,9584;-47,9882
+351940;Ibirá;SP;Sao Paulo;-21,083;-49,2448
+351950;Ibirarema;SP;Sao Paulo;-22,8185;-50,0739
+351960;Ibitinga;SP;Sao Paulo;-21,7562;-48,8319
+351970;Ibiúna;SP;Sao Paulo;-23,6596;-47,223
+351980;Icém;SP;Sao Paulo;-20,3391;-49,1915
+351990;Iepê;SP;Sao Paulo;-22,6602;-51,0779
+352000;Igaraçu do Tietê;SP;Sao Paulo;-22,509;-48,5597
+352010;Igarapava;SP;Sao Paulo;-20,0407;-47,7466
+352020;Igaratá;SP;Sao Paulo;-23,2037;-46,157
+352030;Iguape;SP;Sao Paulo;-24,699;-47,5537
+352042;Ilha Comprida;SP;Sao Paulo;-24,7307;-47,5383
+352044;Ilha Solteira;SP;Sao Paulo;-20,4326;-51,3426
+352040;Ilhabela;SP;Sao Paulo;-23,7785;-45,3552
+352050;Indaiatuba;SP;Sao Paulo;-23,0816;-47,2101
+352060;Indiana;SP;Sao Paulo;-22,1738;-51,2555
+352070;Indiaporã;SP;Sao Paulo;-19,979;-50,2909
+352080;Inúbia Paulista;SP;Sao Paulo;-21,7695;-50,9633
+352090;Ipaussu;SP;Sao Paulo;-23,0575;-49,6279
+352100;Iperó;SP;Sao Paulo;-23,3513;-47,6927
+352110;Ipeúna;SP;Sao Paulo;-22,4355;-47,7151
+352115;Ipiguá;SP;Sao Paulo;-20,6557;-49,3842
+352120;Iporanga;SP;Sao Paulo;-24,5847;-48,5971
+352130;Ipuã;SP;Sao Paulo;-20,4438;-48,0129
+352140;Iracemápolis;SP;Sao Paulo;-22,5832;-47,523
+352150;Irapuã;SP;Sao Paulo;-21,2768;-49,4164
+352160;Irapuru;SP;Sao Paulo;-21,5684;-51,3472
+352170;Itaberá;SP;Sao Paulo;-23,8638;-49,14
+352180;Itaí;SP;Sao Paulo;-23,4213;-49,092
+352190;Itajobi;SP;Sao Paulo;-21,3123;-49,0629
+352200;Itaju;SP;Sao Paulo;-21,9857;-48,8116
+352210;Itanhaém;SP;Sao Paulo;-24,1736;-46,788
+352215;Itaóca;SP;Sao Paulo;-24,6393;-48,8413
+352220;Itapecerica da Serra;SP;Sao Paulo;-23,7161;-46,8572
+352230;Itapetininga;SP;Sao Paulo;-23,5886;-48,0483
+352240;Itapeva;SP;Sao Paulo;-23,9788;-48,8764
+352250;Itapevi;SP;Sao Paulo;-23,5488;-46,9327
+352260;Itapira;SP;Sao Paulo;-22,4357;-46,8224
+352265;Itapirapuã Paulista;SP;Sao Paulo;-24,572;-49,1661
+352270;Itápolis;SP;Sao Paulo;-21,5942;-48,8149
+352280;Itaporanga;SP;Sao Paulo;-23,7043;-49,4819
+352290;Itapuí;SP;Sao Paulo;-22,2324;-48,7197
+352300;Itapura;SP;Sao Paulo;-20,6419;-51,5063
+352310;Itaquaquecetuba;SP;Sao Paulo;-23,4835;-46,3457
+352320;Itararé;SP;Sao Paulo;-24,1085;-49,3352
+352330;Itariri;SP;Sao Paulo;-24,2834;-47,1736
+352340;Itatiba;SP;Sao Paulo;-23,0035;-46,8464
+352350;Itatinga;SP;Sao Paulo;-23,1047;-48,6157
+352360;Itirapina;SP;Sao Paulo;-22,2562;-47,8166
+352370;Itirapuã;SP;Sao Paulo;-20,6416;-47,2194
+352380;Itobi;SP;Sao Paulo;-21,7309;-46,9743
+352390;Itu;SP;Sao Paulo;-23,2544;-47,2927
+352400;Itupeva;SP;Sao Paulo;-23,1526;-47,0593
+352410;Ituverava;SP;Sao Paulo;-20,3355;-47,7902
+352420;Jaborandi;SP;Sao Paulo;-20,6884;-48,4112
+352430;Jaboticabal;SP;Sao Paulo;-21,252;-48,3252
+352440;Jacareí;SP;Sao Paulo;-23,2983;-45,9658
+352450;Jaci;SP;Sao Paulo;-20,8805;-49,5797
+352460;Jacupiranga;SP;Sao Paulo;-24,6963;-48,0064
+352470;Jaguariúna;SP;Sao Paulo;-22,7037;-46,9851
+352480;Jales;SP;Sao Paulo;-20,2672;-50,5494
+352490;Jambeiro;SP;Sao Paulo;-23,2522;-45,6942
+352500;Jandira;SP;Sao Paulo;-23,5275;-46,9023
+352510;Jardinópolis;SP;Sao Paulo;-21,0176;-47,7606
+352520;Jarinu;SP;Sao Paulo;-23,1039;-46,728
+352530;Jaú;SP;Sao Paulo;-22,2936;-48,5592
+352540;Jeriquara;SP;Sao Paulo;-20,3116;-47,5918
+352550;Joanópolis;SP;Sao Paulo;-22,927;-46,2741
+352560;João Ramalho;SP;Sao Paulo;-22,2473;-50,7694
+352570;José Bonifácio;SP;Sao Paulo;-21,0551;-49,6892
+352580;Júlio Mesquita;SP;Sao Paulo;-22,0112;-49,7873
+352585;Jumirim;SP;Sao Paulo;-23,0884;-47,7868
+352590;Jundiaí;SP;Sao Paulo;-23,1852;-46,8974
+352600;Junqueirópolis;SP;Sao Paulo;-21,5103;-51,4342
+352610;Juquiá;SP;Sao Paulo;-24,3101;-47,6426
+352620;Juquitiba;SP;Sao Paulo;-23,9244;-47,0653
+352630;Lagoinha;SP;Sao Paulo;-23,0846;-45,1944
+352640;Laranjal Paulista;SP;Sao Paulo;-23,0506;-47,8375
+352650;Lavínia;SP;Sao Paulo;-21,1639;-51,0412
+352660;Lavrinhas;SP;Sao Paulo;-22,57;-44,9024
+352670;Leme;SP;Sao Paulo;-22,1809;-47,3841
+352680;Lençóis Paulista;SP;Sao Paulo;-22,6027;-48,8037
+352690;Limeira;SP;Sao Paulo;-22,566;-47,397
+352700;Lindóia;SP;Sao Paulo;-22,5226;-46,65
+352710;Lins;SP;Sao Paulo;-21,6718;-49,7526
+352720;Lorena;SP;Sao Paulo;-22,7334;-45,1197
+352725;Lourdes;SP;Sao Paulo;-20,966;-50,2263
+352730;Louveira;SP;Sao Paulo;-23,0856;-46,9484
+352740;Lucélia;SP;Sao Paulo;-21,7182;-51,0215
+352750;Lucianópolis;SP;Sao Paulo;-22,4294;-49,522
+352760;Luís Antônio;SP;Sao Paulo;-21,55;-47,7801
+352770;Luiziânia;SP;Sao Paulo;-21,6737;-50,3294
+352780;Lupércio;SP;Sao Paulo;-22,4146;-49,818
+352790;Lutécia;SP;Sao Paulo;-22,3384;-50,394
+352800;Macatuba;SP;Sao Paulo;-22,5002;-48,7102
+352810;Macaubal;SP;Sao Paulo;-20,8022;-49,9687
+352820;Macedônia;SP;Sao Paulo;-20,1444;-50,1973
+352830;Magda;SP;Sao Paulo;-20,6445;-50,2305
+352840;Mairinque;SP;Sao Paulo;-23,5398;-47,185
+352850;Mairiporã;SP;Sao Paulo;-23,3171;-46,5897
+352860;Manduri;SP;Sao Paulo;-23,0056;-49,3202
+352870;Marabá Paulista;SP;Sao Paulo;-22,1068;-51,9617
+352880;Maracaí;SP;Sao Paulo;-22,6149;-50,6713
+352885;Marapoama;SP;Sao Paulo;-21,2587;-49,13
+352890;Mariápolis;SP;Sao Paulo;-21,7959;-51,1824
+352900;Marília;SP;Sao Paulo;-22,2171;-49,9501
+352910;Marinópolis;SP;Sao Paulo;-20,4389;-50,8254
+352920;Martinópolis;SP;Sao Paulo;-22,1462;-51,1709
+352930;Matão;SP;Sao Paulo;-21,6025;-48,364
+352940;Mauá;SP;Sao Paulo;-23,6677;-46,4613
+352950;Mendonça;SP;Sao Paulo;-21,1757;-49,5791
+352960;Meridiano;SP;Sao Paulo;-20,3579;-50,1811
+352965;Mesópolis;SP;Sao Paulo;-19,9684;-50,6326
+352970;Miguelópolis;SP;Sao Paulo;-20,1796;-48,031
+352980;Mineiros do Tietê;SP;Sao Paulo;-22,412;-48,451
+353000;Mira Estrela;SP;Sao Paulo;-19,9789;-50,139
+352990;Miracatu;SP;Sao Paulo;-24,2766;-47,4625
+353010;Mirandópolis;SP;Sao Paulo;-21,1313;-51,1035
+353020;Mirante do Paranapanema;SP;Sao Paulo;-22,2904;-51,9084
+353030;Mirassol;SP;Sao Paulo;-20,8169;-49,5206
+353040;Mirassolândia;SP;Sao Paulo;-20,6179;-49,4617
+353050;Mococa;SP;Sao Paulo;-21,4647;-47,0024
+353060;Mogi das Cruzes;SP;Sao Paulo;-23,5208;-46,1854
+353070;Mogi Guaçu;SP;Sao Paulo;-22,3675;-46,9428
+353080;Mogi Mirim;SP;Sao Paulo;-22,4332;-46,9532
+353090;Mombuca;SP;Sao Paulo;-22,9285;-47,559
+353100;Monções;SP;Sao Paulo;-20,8509;-50,0975
+353110;Mongaguá;SP;Sao Paulo;-24,0809;-46,6265
+353120;Monte Alegre do Sul;SP;Sao Paulo;-22,6817;-46,681
+353130;Monte Alto;SP;Sao Paulo;-21,2655;-48,4971
+353140;Monte Aprazível;SP;Sao Paulo;-20,768;-49,7184
+353150;Monte Azul Paulista;SP;Sao Paulo;-20,9065;-48,6387
+353160;Monte Castelo;SP;Sao Paulo;-21,2981;-51,5679
+353180;Monte Mor;SP;Sao Paulo;-22,945;-47,3122
+353170;Monteiro Lobato;SP;Sao Paulo;-22,9544;-45,8407
+353190;Morro Agudo;SP;Sao Paulo;-20,7288;-48,0581
+353200;Morungaba;SP;Sao Paulo;-22,8811;-46,7896
+353205;Motuca;SP;Sao Paulo;-21,5103;-48,1538
+353210;Murutinga do Sul;SP;Sao Paulo;-20,9908;-51,2774
+353215;Nantes;SP;Sao Paulo;-22,6156;-51,24
+353220;Narandiba;SP;Sao Paulo;-22,4057;-51,5274
+353230;Natividade da Serra;SP;Sao Paulo;-23,3707;-45,4468
+353240;Nazaré Paulista;SP;Sao Paulo;-23,1747;-46,3983
+353250;Neves Paulista;SP;Sao Paulo;-20,843;-49,6358
+353260;Nhandeara;SP;Sao Paulo;-20,6945;-50,0436
+353270;Nipoã;SP;Sao Paulo;-20,9114;-49,7833
+353280;Nova Aliança;SP;Sao Paulo;-21,0156;-49,4986
+353282;Nova Campina;SP;Sao Paulo;-24,1224;-48,9022
+353284;Nova Canaã Paulista;SP;Sao Paulo;-20,3836;-50,9483
+353286;Nova Castilho;SP;Sao Paulo;-20,7615;-50,3477
+353290;Nova Europa;SP;Sao Paulo;-21,7765;-48,5705
+353300;Nova Granada;SP;Sao Paulo;-20,5321;-49,3123
+353310;Nova Guataporanga;SP;Sao Paulo;-21,332;-51,6447
+353320;Nova Independência;SP;Sao Paulo;-21,1026;-51,4905
+353330;Nova Luzitânia;SP;Sao Paulo;-20,856;-50,2617
+353340;Nova Odessa;SP;Sao Paulo;-22,7832;-47,2941
+353325;Novais;SP;Sao Paulo;-20,9893;-48,9141
+353350;Novo Horizonte;SP;Sao Paulo;-21,4651;-49,2234
+353360;Nuporanga;SP;Sao Paulo;-20,7296;-47,7429
+353370;Ocauçu;SP;Sao Paulo;-22,438;-49,922
+353380;Óleo;SP;Sao Paulo;-22,9435;-49,3419
+353390;Olímpia;SP;Sao Paulo;-20,7366;-48,9106
+353400;Onda Verde;SP;Sao Paulo;-20,6042;-49,2929
+353410;Oriente;SP;Sao Paulo;-22,1549;-50,0971
+353420;Orindiúva;SP;Sao Paulo;-20,1861;-49,3464
+353430;Orlândia;SP;Sao Paulo;-20,7169;-47,8852
+353440;Osasco;SP;Sao Paulo;-23,5324;-46,7916
+353450;Oscar Bressane;SP;Sao Paulo;-22,3149;-50,2811
+353460;Osvaldo Cruz;SP;Sao Paulo;-21,7968;-50,8793
+353470;Ourinhos;SP;Sao Paulo;-22,9797;-49,8697
+353480;Ouro Verde;SP;Sao Paulo;-21,4872;-51,7024
+353475;Ouroeste;SP;Sao Paulo;-20,0061;-50,3768
+353490;Pacaembu;SP;Sao Paulo;-21,5627;-51,2654
+353500;Palestina;SP;Sao Paulo;-20,39;-49,4309
+353510;Palmares Paulista;SP;Sao Paulo;-21,0854;-48,8037
+353520;Palmeira d'Oeste;SP;Sao Paulo;-20,4148;-50,7632
+353530;Palmital;SP;Sao Paulo;-22,7858;-50,218
+353540;Panorama;SP;Sao Paulo;-21,354;-51,8562
+353550;Paraguaçu Paulista;SP;Sao Paulo;-22,4114;-50,5732
+353560;Paraibuna;SP;Sao Paulo;-23,3872;-45,6639
+353570;Paraíso;SP;Sao Paulo;-21,0159;-48,7761
+353580;Paranapanema;SP;Sao Paulo;-23,3862;-48,7214
+353590;Paranapuã;SP;Sao Paulo;-20,1048;-50,5886
+353600;Parapuã;SP;Sao Paulo;-21,7792;-50,7949
+353610;Pardinho;SP;Sao Paulo;-23,0841;-48,3679
+353620;Pariquera-Açu;SP;Sao Paulo;-24,7147;-47,8742
+353625;Parisi;SP;Sao Paulo;-20,3034;-50,0163
+353630;Patrocínio Paulista;SP;Sao Paulo;-20,6384;-47,2801
+353640;Paulicéia;SP;Sao Paulo;-21,3153;-51,8321
+353650;Paulínia;SP;Sao Paulo;-22,7542;-47,1488
+353657;Paulistânia;SP;Sao Paulo;-22,5768;-49,4008
+353660;Paulo de Faria;SP;Sao Paulo;-20,0296;-49,4
+353670;Pederneiras;SP;Sao Paulo;-22,3511;-48,7781
+353680;Pedra Bela;SP;Sao Paulo;-22,7902;-46,4455
+353690;Pedranópolis;SP;Sao Paulo;-20,2474;-50,1129
+353700;Pedregulho;SP;Sao Paulo;-20,2535;-47,4775
+353710;Pedreira;SP;Sao Paulo;-22,7413;-46,8948
+353715;Pedrinhas Paulista;SP;Sao Paulo;-22,8174;-50,7933
+353720;Pedro de Toledo;SP;Sao Paulo;-24,2764;-47,2354
+353730;Penápolis;SP;Sao Paulo;-21,4148;-50,0769
+353740;Pereira Barreto;SP;Sao Paulo;-20,6368;-51,1123
+353750;Pereiras;SP;Sao Paulo;-23,0804;-47,972
+353760;Peruíbe;SP;Sao Paulo;-24,312;-47,0012
+353770;Piacatu;SP;Sao Paulo;-21,5921;-50,6003
+353780;Piedade;SP;Sao Paulo;-23,7139;-47,4256
+353790;Pilar do Sul;SP;Sao Paulo;-23,8077;-47,7222
+353800;Pindamonhangaba;SP;Sao Paulo;-22,9246;-45,4613
+353810;Pindorama;SP;Sao Paulo;-21,1853;-48,9086
+353820;Pinhalzinho;SP;Sao Paulo;-22,7811;-46,5897
+353830;Piquerobi;SP;Sao Paulo;-21,8747;-51,7282
+353850;Piquete;SP;Sao Paulo;-22,6069;-45,1869
+353860;Piracaia;SP;Sao Paulo;-23,0525;-46,3594
+353870;Piracicaba;SP;Sao Paulo;-22,7338;-47,6476
+353880;Piraju;SP;Sao Paulo;-23,1981;-49,3803
+353890;Pirajuí;SP;Sao Paulo;-21,999;-49,4608
+353900;Pirangi;SP;Sao Paulo;-21,0886;-48,6607
+353910;Pirapora do Bom Jesus;SP;Sao Paulo;-23,3965;-46,9991
+353920;Pirapozinho;SP;Sao Paulo;-22,2711;-51,4976
+353930;Pirassununga;SP;Sao Paulo;-21,996;-47,4257
+353940;Piratininga;SP;Sao Paulo;-22,4142;-49,1339
+353950;Pitangueiras;SP;Sao Paulo;-21,0132;-48,221
+353960;Planalto;SP;Sao Paulo;-21,0342;-49,933
+353970;Platina;SP;Sao Paulo;-22,6371;-50,2104
+353980;Poá;SP;Sao Paulo;-23,5333;-46,3473
+353990;Poloni;SP;Sao Paulo;-20,7829;-49,8258
+354000;Pompéia;SP;Sao Paulo;-22,107;-50,176
+354010;Pongaí;SP;Sao Paulo;-21,7396;-49,3604
+354020;Pontal;SP;Sao Paulo;-21,0216;-48,0423
+354025;Pontalinda;SP;Sao Paulo;-20,4396;-50,5258
+354030;Pontes Gestal;SP;Sao Paulo;-20,1727;-49,7064
+354040;Populina;SP;Sao Paulo;-19,9453;-50,538
+354050;Porangaba;SP;Sao Paulo;-23,1761;-48,1195
+354060;Porto Feliz;SP;Sao Paulo;-23,2093;-47,5251
+354070;Porto Ferreira;SP;Sao Paulo;-21,8498;-47,487
+354075;Potim;SP;Sao Paulo;-22,8343;-45,2552
+354080;Potirendaba;SP;Sao Paulo;-21,0428;-49,3815
+354085;Pracinha;SP;Sao Paulo;-21,8496;-51,0868
+354090;Pradópolis;SP;Sao Paulo;-21,3626;-48,0679
+354100;Praia Grande;SP;Sao Paulo;-24,0084;-46,4121
+354105;Pratânia;SP;Sao Paulo;-22,8112;-48,6636
+354110;Presidente Alves;SP;Sao Paulo;-22,0999;-49,4381
+354120;Presidente Bernardes;SP;Sao Paulo;-22,0082;-51,5565
+354130;Presidente Epitácio;SP;Sao Paulo;-21,7651;-52,1111
+354140;Presidente Prudente;SP;Sao Paulo;-22,1207;-51,3925
+354150;Presidente Venceslau;SP;Sao Paulo;-21,8732;-51,8447
+354160;Promissão;SP;Sao Paulo;-21,5356;-49,8599
+354165;Quadra;SP;Sao Paulo;-23,2993;-48,0547
+354170;Quatá;SP;Sao Paulo;-22,2456;-50,6966
+354180;Queiroz;SP;Sao Paulo;-21,7969;-50,2415
+354190;Queluz;SP;Sao Paulo;-22,5312;-44,7781
+354200;Quintana;SP;Sao Paulo;-22,0692;-50,307
+354210;Rafard;SP;Sao Paulo;-23,0105;-47,5318
+354220;Rancharia;SP;Sao Paulo;-22,2269;-50,893
+354230;Redenção da Serra;SP;Sao Paulo;-23,2638;-45,5422
+354240;Regente Feijó;SP;Sao Paulo;-22,2181;-51,3055
+354250;Reginópolis;SP;Sao Paulo;-21,8914;-49,2268
+354260;Registro;SP;Sao Paulo;-24,4979;-47,8449
+354270;Restinga;SP;Sao Paulo;-20,6056;-47,4833
+354280;Ribeira;SP;Sao Paulo;-24,6517;-49,0044
+354290;Ribeirão Bonito;SP;Sao Paulo;-22,0685;-48,182
+354300;Ribeirão Branco;SP;Sao Paulo;-24,2206;-48,7635
+354310;Ribeirão Corrente;SP;Sao Paulo;-20,4579;-47,5904
+354320;Ribeirão do Sul;SP;Sao Paulo;-22,789;-49,933
+354323;Ribeirão dos Índios;SP;Sao Paulo;-21,8382;-51,6103
+354325;Ribeirão Grande;SP;Sao Paulo;-24,1011;-48,3679
+354330;Ribeirão Pires;SP;Sao Paulo;-23,7067;-46,4058
+354340;Ribeirão Preto;SP;Sao Paulo;-21,1699;-47,8099
+354360;Rifaina;SP;Sao Paulo;-20,0803;-47,4291
+354370;Rincão;SP;Sao Paulo;-21,5894;-48,0728
+354380;Rinópolis;SP;Sao Paulo;-21,7284;-50,7239
+354390;Rio Claro;SP;Sao Paulo;-22,3984;-47,5546
+354400;Rio das Pedras;SP;Sao Paulo;-22,8417;-47,6047
+354410;Rio Grande da Serra;SP;Sao Paulo;-23,7437;-46,3971
+354420;Riolândia;SP;Sao Paulo;-19,9868;-49,6836
+354350;Riversul;SP;Sao Paulo;-23,829;-49,429
+354425;Rosana;SP;Sao Paulo;-22,5782;-53,0603
+354430;Roseira;SP;Sao Paulo;-22,8938;-45,307
+354440;Rubiácea;SP;Sao Paulo;-21,3006;-50,7296
+354450;Rubinéia;SP;Sao Paulo;-20,1759;-51,007
+354460;Sabino;SP;Sao Paulo;-21,4593;-49,5755
+354470;Sagres;SP;Sao Paulo;-21,8823;-50,9594
+354480;Sales;SP;Sao Paulo;-21,3427;-49,4897
+354490;Sales Oliveira;SP;Sao Paulo;-20,7696;-47,8369
+354500;Salesópolis;SP;Sao Paulo;-23,5288;-45,8465
+354510;Salmourão;SP;Sao Paulo;-21,6267;-50,8614
+354515;Saltinho;SP;Sao Paulo;-22,8442;-47,6754
+354520;Salto;SP;Sao Paulo;-23,1996;-47,2931
+354530;Salto de Pirapora;SP;Sao Paulo;-23,6474;-47,5743
+354540;Salto Grande;SP;Sao Paulo;-22,8894;-49,9831
+354550;Sandovalina;SP;Sao Paulo;-22,4551;-51,7648
+354560;Santa Adélia;SP;Sao Paulo;-21,2427;-48,8063
+354570;Santa Albertina;SP;Sao Paulo;-20,0311;-50,7297
+354580;Santa Bárbara d'Oeste;SP;Sao Paulo;-22,7553;-47,4143
+354600;Santa Branca;SP;Sao Paulo;-23,3933;-45,8875
+354610;Santa Clara d'Oeste;SP;Sao Paulo;-20,09;-50,9491
+354620;Santa Cruz da Conceição;SP;Sao Paulo;-22,1405;-47,4512
+354625;Santa Cruz da Esperança;SP;Sao Paulo;-21,2951;-47,4304
+354630;Santa Cruz das Palmeiras;SP;Sao Paulo;-21,8235;-47,248
+354640;Santa Cruz do Rio Pardo;SP;Sao Paulo;-22,8988;-49,6354
+354650;Santa Ernestina;SP;Sao Paulo;-21,4618;-48,3953
+354660;Santa Fé do Sul;SP;Sao Paulo;-20,2083;-50,932
+354670;Santa Gertrudes;SP;Sao Paulo;-22,4572;-47,5272
+354680;Santa Isabel;SP;Sao Paulo;-23,3172;-46,2237
+354690;Santa Lúcia;SP;Sao Paulo;-21,685;-48,0885
+354700;Santa Maria da Serra;SP;Sao Paulo;-22,5661;-48,1593
+354710;Santa Mercedes;SP;Sao Paulo;-21,3495;-51,7564
+354740;Santa Rita d'Oeste;SP;Sao Paulo;-20,1414;-50,8358
+354750;Santa Rita do Passa Quatro;SP;Sao Paulo;-21,7083;-47,478
+354760;Santa Rosa de Viterbo;SP;Sao Paulo;-21,4776;-47,3622
+354765;Santa Salete;SP;Sao Paulo;-20,2429;-50,6887
+354720;Santana da Ponte Pensa;SP;Sao Paulo;-20,2523;-50,8014
+354730;Santana de Parnaíba;SP;Sao Paulo;-23,4439;-46,9178
+354770;Santo Anastácio;SP;Sao Paulo;-21,9747;-51,6527
+354780;Santo André;SP;Sao Paulo;-23,6737;-46,5432
+354790;Santo Antônio da Alegria;SP;Sao Paulo;-21,0864;-47,1464
+354800;Santo Antônio de Posse;SP;Sao Paulo;-22,6029;-46,9192
+354805;Santo Antônio do Aracanguá;SP;Sao Paulo;-20,9331;-50,498
+354810;Santo Antônio do Jardim;SP;Sao Paulo;-22,1121;-46,6845
+354820;Santo Antônio do Pinhal;SP;Sao Paulo;-22,827;-45,663
+354830;Santo Expedito;SP;Sao Paulo;-21,8467;-51,3929
+354840;Santópolis do Aguapeí;SP;Sao Paulo;-21,6376;-50,5044
+354850;Santos;SP;Sao Paulo;-23,9535;-46,335
+354860;São Bento do Sapucaí;SP;Sao Paulo;-22,6837;-45,7287
+354870;São Bernardo do Campo;SP;Sao Paulo;-23,6914;-46,5646
+354880;São Caetano do Sul;SP;Sao Paulo;-23,6229;-46,5548
+354890;São Carlos;SP;Sao Paulo;-22,0174;-47,886
+354900;São Francisco;SP;Sao Paulo;-20,3623;-50,6952
+354910;São João da Boa Vista;SP;Sao Paulo;-21,9707;-46,7944
+354920;São João das Duas Pontes;SP;Sao Paulo;-20,3879;-50,3792
+354925;São João de Iracema;SP;Sao Paulo;-20,5111;-50,3561
+354930;São João do Pau d'Alho;SP;Sao Paulo;-21,2662;-51,6672
+354940;São Joaquim da Barra;SP;Sao Paulo;-20,5812;-47,8593
+354950;São José da Bela Vista;SP;Sao Paulo;-20,5935;-47,6424
+354960;São José do Barreiro;SP;Sao Paulo;-22,6414;-44,5774
+354970;São José do Rio Pardo;SP;Sao Paulo;-21,5953;-46,8873
+354980;São José do Rio Preto;SP;Sao Paulo;-20,8113;-49,3758
+354990;São José dos Campos;SP;Sao Paulo;-23,1896;-45,8841
+354995;São Lourenço da Serra;SP;Sao Paulo;-23,8491;-46,9432
+355000;São Luiz do Paraitinga;SP;Sao Paulo;-23,222;-45,3109
+355010;São Manuel;SP;Sao Paulo;-22,7321;-48,5723
+355020;São Miguel Arcanjo;SP;Sao Paulo;-23,8782;-47,9935
+355030;São Paulo;SP;Sao Paulo;-23,5329;-46,6395
+355040;São Pedro;SP;Sao Paulo;-22,5483;-47,9096
+355050;São Pedro do Turvo;SP;Sao Paulo;-22,7453;-49,7428
+355060;São Roque;SP;Sao Paulo;-23,5226;-47,1357
+355070;São Sebastião;SP;Sao Paulo;-23,7951;-45,4143
+355080;São Sebastião da Grama;SP;Sao Paulo;-21,7041;-46,8208
+355090;São Simão;SP;Sao Paulo;-21,4732;-47,5518
+355100;São Vicente;SP;Sao Paulo;-23,9574;-46,3883
+355110;Sarapuí;SP;Sao Paulo;-23,6397;-47,8249
+355120;Sarutaiá;SP;Sao Paulo;-23,2721;-49,4763
+355130;Sebastianópolis do Sul;SP;Sao Paulo;-20,6523;-49,925
+355140;Serra Azul;SP;Sao Paulo;-21,3074;-47,5602
+355160;Serra Negra;SP;Sao Paulo;-22,6139;-46,7033
+355150;Serrana;SP;Sao Paulo;-21,2043;-47,5952
+355170;Sertãozinho;SP;Sao Paulo;-21,1316;-47,9875
+355180;Sete Barras;SP;Sao Paulo;-24,382;-47,9279
+355190;Severínia;SP;Sao Paulo;-20,8108;-48,8054
+355200;Silveiras;SP;Sao Paulo;-22,6638;-44,8522
+355210;Socorro;SP;Sao Paulo;-22,5903;-46,5251
+355220;Sorocaba;SP;Sao Paulo;-23,4969;-47,4451
+355230;Sud Mennucci;SP;Sao Paulo;-20,6872;-50,9238
+355240;Sumaré;SP;Sao Paulo;-22,8204;-47,2728
+355255;Suzanápolis;SP;Sao Paulo;-20,4981;-51,0268
+355250;Suzano;SP;Sao Paulo;-23,5448;-46,3112
+355260;Tabapuã;SP;Sao Paulo;-20,9602;-49,0307
+355270;Tabatinga;SP;Sao Paulo;-21,7239;-48,6896
+355280;Taboão da Serra;SP;Sao Paulo;-23,6019;-46,7526
+355290;Taciba;SP;Sao Paulo;-22,3866;-51,2882
+355300;Taguaí;SP;Sao Paulo;-23,4452;-49,4024
+355310;Taiaçu;SP;Sao Paulo;-21,1431;-48,5112
+355320;Taiúva;SP;Sao Paulo;-21,1223;-48,4528
+355330;Tambaú;SP;Sao Paulo;-21,7029;-47,2703
+355340;Tanabi;SP;Sao Paulo;-20,6228;-49,6563
+355350;Tapiraí;SP;Sao Paulo;-23,9612;-47,5062
+355360;Tapiratiba;SP;Sao Paulo;-21,4713;-46,7448
+355365;Taquaral;SP;Sao Paulo;-21,0737;-48,4126
+355370;Taquaritinga;SP;Sao Paulo;-21,4049;-48,5103
+355380;Taquarituba;SP;Sao Paulo;-23,5307;-49,241
+355385;Taquarivaí;SP;Sao Paulo;-23,9211;-48,6948
+355390;Tarabai;SP;Sao Paulo;-22,3016;-51,5621
+355395;Tarumã;SP;Sao Paulo;-22,7429;-50,5786
+355400;Tatuí;SP;Sao Paulo;-23,3487;-47,8461
+355410;Taubaté;SP;Sao Paulo;-23,0104;-45,5593
+355420;Tejupá;SP;Sao Paulo;-23,3425;-49,3722
+355430;Teodoro Sampaio;SP;Sao Paulo;-22,5299;-52,1682
+355440;Terra Roxa;SP;Sao Paulo;-20,787;-48,3314
+355450;Tietê;SP;Sao Paulo;-23,1101;-47,7164
+355460;Timburi;SP;Sao Paulo;-23,2057;-49,6096
+355465;Torre de Pedra;SP;Sao Paulo;-23,2462;-48,1955
+355470;Torrinha;SP;Sao Paulo;-22,4237;-48,1731
+355475;Trabiju;SP;Sao Paulo;-22,0388;-48,3342
+355480;Tremembé;SP;Sao Paulo;-22,9571;-45,5475
+355490;Três Fronteiras;SP;Sao Paulo;-20,2344;-50,8905
+355495;Tuiuti;SP;Sao Paulo;-22,8193;-46,6937
+355500;Tupã;SP;Sao Paulo;-21,9335;-50,5191
+355510;Tupi Paulista;SP;Sao Paulo;-21,3825;-51,575
+355520;Turiúba;SP;Sao Paulo;-20,9428;-50,1135
+355530;Turmalina;SP;Sao Paulo;-20,0486;-50,4792
+355535;Ubarana;SP;Sao Paulo;-21,165;-49,7198
+355540;Ubatuba;SP;Sao Paulo;-23,4332;-45,0834
+355550;Ubirajara;SP;Sao Paulo;-22,5272;-49,6613
+355560;Uchoa;SP;Sao Paulo;-20,9511;-49,1713
+355570;União Paulista;SP;Sao Paulo;-20,8862;-49,9025
+355580;Urânia;SP;Sao Paulo;-20,2455;-50,6455
+355590;Uru;SP;Sao Paulo;-21,7866;-49,2848
+355600;Urupês;SP;Sao Paulo;-21,2032;-49,2931
+355610;Valentim Gentil;SP;Sao Paulo;-20,4217;-50,0889
+355620;Valinhos;SP;Sao Paulo;-22,9698;-46,9974
+355630;Valparaíso;SP;Sao Paulo;-21,2229;-50,8699
+355635;Vargem;SP;Sao Paulo;-22,887;-46,4124
+355640;Vargem Grande do Sul;SP;Sao Paulo;-21,8322;-46,8913
+355645;Vargem Grande Paulista;SP;Sao Paulo;-23,5993;-47,022
+355650;Várzea Paulista;SP;Sao Paulo;-23,2136;-46,8234
+355660;Vera Cruz;SP;Sao Paulo;-22,2183;-49,8207
+355670;Vinhedo;SP;Sao Paulo;-23,0302;-46,9833
+355680;Viradouro;SP;Sao Paulo;-20,8734;-48,293
+355690;Vista Alegre do Alto;SP;Sao Paulo;-21,1692;-48,6284
+355695;Vitória Brasil;SP;Sao Paulo;-20,1956;-50,4875
+355700;Votorantim;SP;Sao Paulo;-23,5446;-47,4388
+355710;Votuporanga;SP;Sao Paulo;-20,4237;-49,9781
+355715;Zacarias;SP;Sao Paulo;-21,0506;-50,0552

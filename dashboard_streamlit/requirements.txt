@@ -1,0 +1,16 @@
+streamlit>=1.63
+pandas>=2.3
+plotly>=6.2
+python-dotenv>=1.0
+oracledb>=4.0
+
+# RAG do Chat MedData (pages/4_Chat_MedData.py, agente_rag.py, rag.py)
+chromadb>=1.5
+langchain>=1.4
+langchain-chroma>=1.1
+langchain-huggingface>=1.2
+sentence-transformers>=6.0
+
+# Painel preditivo (notebooks/painel_preditivo.ipynb)
+statsmodels>=0.15
+ipykernel>=6.29
