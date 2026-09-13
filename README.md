@@ -70,21 +70,15 @@ flowchart LR
 
 ## Screenshot
 
-<img width="1550" height="741" alt="image" src="https://github.com/user-attachments/assets/2c4f8117-97ce-409d-bc6e-f27b1e4eff1c" />
-<img width="1600" height="771" alt="image" src="https://github.com/user-attachments/assets/83594514-1449-40f9-b80c-3c65a51a08e4" />
-<img width="1600" height="767" alt="image" src="https://github.com/user-attachments/assets/3db8acf1-53b5-4894-8593-fbf38fd371f1" />
-<img width="1600" height="810" alt="image" src="https://github.com/user-attachments/assets/89be40eb-5546-4212-9fd9-08e6253e9d52" />
-<img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/7923f2d0-1ce6-4d7f-a592-3b4bb32b6c7f" />
-<img width="1600" height="771" alt="image" src="https://github.com/user-attachments/assets/319a248b-75d0-4ebe-8488-6da6a50c46eb" />
-<img width="1600" height="775" alt="image" src="https://github.com/user-attachments/assets/08365dc1-a30f-4514-bef9-e23cf1b6feea" />
-<img width="1600" height="839" alt="image" src="https://github.com/user-attachments/assets/44026ad3-bcc8-41d8-a62a-6a2649c0a0f9" />
+<img width="960" height="465" alt="image" src="https://github.com/user-attachments/assets/2c4f8117-97ce-409d-bc6e-f27b1e4eff1c" />
+<img width="960" height="465" alt="image" src="https://github.com/user-attachments/assets/83594514-1449-40f9-b80c-3c65a51a08e4" />
+<img width="960" height="465" alt="image" src="https://github.com/user-attachments/assets/3db8acf1-53b5-4894-8593-fbf38fd371f1" />
+<img width="960" height="465" alt="image" src="https://github.com/user-attachments/assets/89be40eb-5546-4212-9fd9-08e6253e9d52" />
+<img width="960" height="465" alt="image" src="https://github.com/user-attachments/assets/7923f2d0-1ce6-4d7f-a592-3b4bb32b6c7f" />
+<img width="960" height="465" alt="image" src="https://github.com/user-attachments/assets/319a248b-75d0-4ebe-8488-6da6a50c46eb" />
+<img width="960" height="465" alt="image" src="https://github.com/user-attachments/assets/08365dc1-a30f-4514-bef9-e23cf1b6feea" />
+<img width="960" height="504" alt="image" src="https://github.com/user-attachments/assets/44026ad3-bcc8-41d8-a62a-6a2649c0a0f9" />
 
-
-
-
-## 🔗 Acesse o dashboard
-
-**[projeto-meddata.streamlit.app](https://projeto-meddata-3qioneoard7hqeqx9srbsn.streamlit.app/)**
 
 
 ## Arquitetura
@@ -177,9 +171,13 @@ A página **Visão Geral** funciona direto (dados locais); **Pergunte aos Dados*
 - Dados de internação cobrem 2008–2024, mas ~98% do volume está concentrado nos últimos ~12 meses.
 - A previsão de curto prazo é uma projeção estatística (erro médio de ~22% em teste retrospectivo), não uma garantia.
 
+## 🔗 Acesse o dashboard
+
+**[[projeto-meddata.streamlit.app](https://projeto-meddata-3qioneoard7hqeqx9srbsn.streamlit.app/)](https://g64eedc89970a8a-meddataadb.adb.sa-saopaulo-1.oraclecloudapps.com/ords/r/meddata/meddata-dashboard/home)**
+
 ## Autoria
 
-Isabella Batista Santos Oliveira
+Data Sphere
 Projeto desenvolvido para o **Challenge Oracle 2026**.
 
 ## Licença
